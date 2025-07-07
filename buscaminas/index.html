@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buscaminas</title>
+    <link rel="icon" href="assets/bomb-game.png" type="image/png" />
+    <link rel="stylesheet" href="styles/buscaminas.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <header>
+      <h1>Buscaminas</h1>
+    </header>
+    <div id="mensaje-final">
+      <p id="texto-mensaje"></p>
+      <button onclick="reiniciarJuego()" class="button-29" role="button">
+        Reiniciar
+      </button>
+    </div>
+    
+    <div class="dificultad">
+      <h2>Selecciona la dificultad</h2>
+      <select id="dificultad-select">
+        <option value="easy">Fácil (10x10)</option>
+        <option value="medium" selected>Media (20x40)</option>
+        <option value="hard">Difícil (30x60)</option>
+      </select>
+      <button id="iniciar-juego">Iniciar</button>
+    </div>
+
+    <div class="container">
+      <div id="score">
+        <p id="puntaje-text">Puntaje: 0</p>
+        <div id="record">Mejor récord: 0</div>
+      </div>
+    <div id="cells" class="cells" data-ancho="2600" data-alto="1200"></div>
+    </div>
+
+    <footer>
+      <p>
+        Realizado por: <br />
+        <a href="https://github.com/Blangis" target="_blank">Giselle Licona</a>
+        y
+        <a href="https://github.com/Saiko-E" target="_blank">Erick Nava</a>
+      </p>
+    </footer>
+
+    <script src="javascript/buscaminas.js"></script>
+  </body>
+</html>
