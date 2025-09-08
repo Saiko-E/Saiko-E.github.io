@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertidor de Documentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container space-y-6">
+        <h1 class="text-3xl font-bold text-gray-800">Convierte tus documentos</h1>
+        <p class="text-gray-600">Sube tu archivo HTML y CSS para procesarlos.</p>
+        
+        <input type="file" id="subir-archivos" class="hidden" multiple accept=".html,.css">
+        
+        <!-- Botones de acción -->
+        <div class="space-y-4">
+            <button id="boton-subir" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+                Subir archivos
+            </button>
+
+            <button id="boton-descargar" class="w-full px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition-colors hidden">
+                Descargar resultado
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let archivoProcesado = null;
+        let nombreArchivoProcesado = null;
+        let tipoMimeProcesado = null;
+
+        // Elementos del DOM
+        const botonSubir = document.getElementById('boton-subir');
+        const inputSubir = document.getElementById('subir-archivos');
+        const botonDescargar = document.getElementById('boton-descargar');
+
+        // Función para procesar los archivos
+        function procesarArchivos(htmlFile, cssFile) {
+            botonSubir.disabled = true;
+            botonSubir.textContent = 'Procesando...';
+            botonDescargar.classList.add('hidden');
+
+            const leerHTML = new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsText(htmlFile);
+            });
+
+            const leerCSS = new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsText(cssFile);
+            });
+
+            Promise.all([leerHTML, leerCSS])
+                .then(([htmlContenido, cssContenido]) => {
+                    // --- Lógica de conversión (tu código original) ---
+                    try {
+                        cssContenido = cssContenido.replace(/(ORCID)|(orcid)/gi, 'ORCID2');
+                        const tipoRevistaMatch = htmlContenido.match(/class="como_citar">.*?class="cursivas">\s*([^<\s]+)/s);
+                        const revista = tipoRevistaMatch ? tipoRevistaMatch[1].toLowerCase() : '';
+                        console.log(`'${revista}'`);
+
+                        let ubicacionOrcidMatch;
+                        if (revista.includes('problema')) {
+                            ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
+                        } else {
+                            ubicacionOrcidMatch = cssContenido.match(/\.([^}]*autor[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
+                        }
+                        const ubicacionTexto = ubicacionOrcidMatch ? ubicacionOrcidMatch[2] : 'center';
+
+                        const orcidRegex = /https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}/g;
+                        const linkOrcid = [...new Set(htmlContenido.match(orcidRegex) || [])];
+
+                        const clasesVector = `
+.ORCID2 {
+    display: flex;
+    justify-content: ${ubicacionTexto};
+    align-items: center;
+    gap: 0.5em; 
+    margin: 1em 0;
+}
+.ORCID2 ._idSVGInline {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+}
+.ORCID2 svg {
+    width: 80%;
+    height: 80%;
+    display: block;
+}
+.ORCID2 a {
+    text-decoration: none;
+    color: inherit;
+    font-size: 1em;
+}`;
+
+                        const svgContent = `
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+    viewBox="0 0 256 256" xml:space="preserve">
+    <style type="text/css">
+        .st0 { fill: #A6CE39; }
+        .st1 { fill: #FFFFFF; }
+    </style>
+    <circle class="st0" cx="128" cy="128" r="128" />
+    <g>
+        <path class="st1" d="M86.3,186.2H70.9V79.1h15.4v48.4V186.2z" />
+        <path class="st1" d="M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z
+            M124.3,172.4h24.5c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z" />
+        <path class="st1" d="M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1
+            c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z" />
+    </g>
+</svg>`;
+                        let nuevoHtml = htmlContenido;
+                        const regexParaReemplazarGlobal =/((<p class="orcid")|(<p class="ESTILOS-FINALES_ORCID" lang="es-ES")|(<p class="ORCID")|(<p class="ESTILOS-FINALES_orcid")|(<p class="adscripcion" lang="es-ES"><span class="Hiperv-nculo"))>.*?<\/p>/s;
+                       
+                        let i = 0;
+                        nuevoHtml = nuevoHtml.replace(regexParaReemplazarGlobal, (match) => {
+                            const link = linkOrcid[i];
+                            if (!link) {
+                                console.warn("No se encontró un enlace ORCID para el párrafo, se mantiene el original.");
+                                return match;
+                            }
+                            i++;
+
+                            const textoVector = `
+<p class="ORCID2">
+    <span class="_idSVGInline">${svgContent}</span>
+    <a href="${link}">
+        <span class="Hiperv-nculo">${link}</span>
+    </a>
+</p>`;
+                            return textoVector.trim();
+                        });
+
+                        const bloqueCSS = `<style>\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n${clasesVector}\n${cssContenido}\n</style>`;
+                        
+                        function pxToEm(match, pxValue) {
+                            const emValue = parseInt(pxValue) / 8;
+                            return `font-size: ${emValue.toFixed(1)}em;`;
+                        }
+
+                        const cssFinal = bloqueCSS.replace(/font-size:\s*(\d+)px;/g, pxToEm);
+
+                        const linkRegex = /<link[^>]+href="(?:.\/)?estilos\.css"[^>]*>/i;
+                        if (nuevoHtml.match(linkRegex)) {
+                           nuevoHtml = nuevoHtml.replace(linkRegex, cssFinal);
+                        } else {
+                           nuevoHtml = nuevoHtml.replace(/(<\/head>)/i, `\n${cssFinal}\n$1`);
+                        }
+
+                        nuevoHtml = nuevoHtml.replace(/<body([^>]*)>/i, `<body$1>\n<div class='contenedor'>`);
+                        nuevoHtml = nuevoHtml.replace(/<\/body>/i, `</div>\n</body>`);
+
+                        // Guardar el resultado en variables globales para la descarga
+                        archivoProcesado = nuevoHtml;
+                        nombreArchivoProcesado = 'resultado.html';
+                        tipoMimeProcesado = 'text/html';
+
+                        // Actualizar correctamente el estado de los botones
+                        botonSubir.disabled = false;
+                        botonSubir.textContent = 'Subir archivos';
+                        botonDescargar.classList.remove('hidden');
+
+                    } catch (error) {
+                        console.error("Error al procesar los archivos:", error);
+                        console.log("Hubo un error al procesar los archivos. Por favor, asegúrate de haber subido los correctos. Detalles: " + error.message);
+                        botonSubir.disabled = false;
+                        botonSubir.textContent = 'Subir archivos';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al leer los archivos:", error);
+                    console.log("Hubo un error al leer los archivos. Por favor, asegúrate de haber subido los correctos. Detalles: " + error.message);
+                    botonSubir.disabled = false;
+                    botonSubir.textContent = 'Subir archivos';
+                });
+        }
+
+        // Función para descargar el archivo (sin cambios)
+        function descargarArchivo() {
+            if (archivoProcesado) {
+                const blob = new Blob([archivoProcesado], { type: tipoMimeProcesado });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = nombreArchivoProcesado;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } else {
+                console.log("Primero debes subir y procesar un archivo.");
+            }
+        }
+
+        // Lógica de escucha de eventos
+        botonSubir.addEventListener('click', () => {
+            inputSubir.click();
+        });
+
+        inputSubir.addEventListener('change', (event) => {
+            const archivos = event.target.files;
+            if (archivos.length === 2) {
+                const htmlFile = Array.from(archivos).find(file => file.name.endsWith('.html'));
+                const cssFile = Array.from(archivos).find(file => file.name.endsWith('.css'));
+                
+                if (htmlFile && cssFile) {
+                    procesarArchivos(htmlFile, cssFile);
+                } else {
+                    console.log("Por favor, selecciona un archivo HTML y un archivo CSS.");
+                    inputSubir.value = '';
+                }
+            } else {
+                console.log("Por favor, selecciona exactamente dos archivos.");
+                inputSubir.value = '';
+            }
+        });
+
+        // Evento para el nuevo botón de descarga
+        botonDescargar.addEventListener('click', descargarArchivo);
+    </script>
+
+</body>
+</html>
