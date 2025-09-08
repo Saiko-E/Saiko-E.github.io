@@ -214,18 +214,14 @@
             c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z" />
     </g>
 </svg>`;
-                        let nuevoHtml = htmlContenido;
-                        const regexParaReemplazarGlobal = /((<p class="orcid")|(<p class="ESTILOS-FINALES_ORCID" lang="es-ES")|(<p class="ORCID")|(<p class="ESTILOS-FINALES_orcid")|(<p class="adscripcion" lang="es-ES"><span class="Hiperv-nculo"))>.*?<\/p>/s;
-                        
-                        let i = 0;
-                        nuevoHtml = nuevoHtml.replace(regexParaReemplazarGlobal, (match) => {
-                            const link = linkOrcid[i];
-                            if (!link) {
-                                console.warn("No se encontró un enlace ORCID para el párrafo, se mantiene el original.");
-                                return match;
-                            }
-                            i++;
 
+                        let nuevoHtml = htmlContenido;
+                        const regexParaReemplazar = /((<p class="orcid")|(<p class="orcid" lang="en-US")|(<p class="ESTILOS-FINALES_ORCID" lang="es-ES")|(<p class="ORCID")|(<p class="ESTILOS-FINALES_orcid")|(<p class="adscripcion" lang="es-ES"><span class="Hiperv-nculo"))>.*?<\/p>/si;
+
+                        // Itera sobre cada enlace ORCID y reemplaza la primera coincidencia en el HTML.
+                        // Esto replica la lógica del bucle de Python.
+                        for (let i = 0; i < linkOrcid.length; i++) {
+                            const link = linkOrcid[i];
                             const textoVector = `
 <p class="ORCID2">
     <span class="_idSVGInline">${svgContent}</span>
@@ -233,8 +229,8 @@
         <span class="Hiperv-nculo">${link}</span>
     </a>
 </p>`;
-                            return textoVector.trim();
-                        });
+                            nuevoHtml = nuevoHtml.replace(regexParaReemplazar, textoVector.trim());
+                        }
 
                         const bloqueCSS = `<style>\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n${clasesVector}\n${cssContenido}\n</style>`;
                         
