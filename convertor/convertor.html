@@ -33,38 +33,111 @@
 
     <div class="container space-y-6">
         <h1 class="text-3xl font-bold text-gray-800">Convierte tus documentos</h1>
-        <p class="text-gray-600">Sube tu archivo HTML y CSS para procesarlos.</p>
-        
-        <input type="file" id="subir-archivos" class="hidden" multiple accept=".html,.css">
+        <p class="text-gray-600">Sube tu archivo HTML y CSS.</p>
+
+        <!-- Contenedor para el estado de los archivos -->
+        <div id="estado-archivos" class="flex flex-col items-start w-full p-4 border rounded-lg bg-gray-50 border-gray-200 text-left">
+            <div id="estado-html" class="flex items-center space-x-2 text-red-500 font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <span>Archivo HTML: No subido</span>
+            </div>
+            <div id="estado-css" class="flex items-center space-x-2 text-red-500 font-semibold mt-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <span>Archivo CSS: No subido</span>
+            </div>
+        </div>
+
+        <!-- Inputs de archivo ocultos -->
+        <input type="file" id="input-html" class="hidden" accept=".html">
+        <input type="file" id="input-css" class="hidden" accept=".css">
         
         <!-- Botones de acción -->
         <div class="space-y-4">
-            <button id="boton-subir" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
-                Subir archivos
+            <button id="boton-subir-html" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+                Subir archivo HTML
             </button>
-
+            <button id="boton-subir-css" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+                Subir archivo CSS
+            </button>
+            <button id="boton-procesar" class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors" disabled>
+                Procesar y convertir
+            </button>
             <button id="boton-descargar" class="w-full px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition-colors hidden">
                 Descargar resultado
+            </button>
+            <button id="boton-reiniciar" class="w-full px-6 py-3 bg-gray-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-500 transition-colors hidden">
+                Reiniciar
             </button>
         </div>
     </div>
 
     <script>
-        // Variables globales
+        // Variables de estado
+        let htmlFile = null;
+        let cssFile = null;
         let archivoProcesado = null;
         let nombreArchivoProcesado = null;
         let tipoMimeProcesado = null;
 
         // Elementos del DOM
-        const botonSubir = document.getElementById('boton-subir');
-        const inputSubir = document.getElementById('subir-archivos');
+        const inputHtml = document.getElementById('input-html');
+        const inputCss = document.getElementById('input-css');
+        const botonSubirHtml = document.getElementById('boton-subir-html');
+        const botonSubirCss = document.getElementById('boton-subir-css');
+        const botonProcesar = document.getElementById('boton-procesar');
         const botonDescargar = document.getElementById('boton-descargar');
+        const botonReiniciar = document.getElementById('boton-reiniciar');
+        const estadoHtml = document.getElementById('estado-html');
+        const estadoCss = document.getElementById('estado-css');
+
+        function actualizarEstadoUI() {
+            // Actualiza el estado visual de los archivos subidos
+            if (htmlFile) {
+                estadoHtml.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Archivo HTML: ${htmlFile.name}</span>`;
+                estadoHtml.classList.remove('text-red-500');
+                estadoHtml.classList.add('text-green-500');
+            } else {
+                estadoHtml.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg><span>Archivo HTML: No subido</span>`;
+                estadoHtml.classList.add('text-red-500');
+                estadoHtml.classList.remove('text-green-500');
+            }
+
+            if (cssFile) {
+                estadoCss.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Archivo CSS: ${cssFile.name}</span>`;
+                estadoCss.classList.remove('text-red-500');
+                estadoCss.classList.add('text-green-500');
+            } else {
+                estadoCss.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg><span>Archivo CSS: No subido</span>`;
+                estadoCss.classList.add('text-red-500');
+                estadoCss.classList.remove('text-green-500');
+            }
+
+            // Habilita el botón de procesar si ambos archivos están subidos
+            if (htmlFile && cssFile) {
+                botonProcesar.disabled = false;
+            } else {
+                botonProcesar.disabled = true;
+            }
+
+            // Muestra el botón de reiniciar si al menos un archivo está subido
+            if (htmlFile || cssFile) {
+                botonReiniciar.classList.remove('hidden');
+            } else {
+                botonReiniciar.classList.add('hidden');
+            }
+        }
 
         // Función para procesar los archivos
         function procesarArchivos(htmlFile, cssFile) {
-            botonSubir.disabled = true;
-            botonSubir.textContent = 'Procesando...';
+            botonProcesar.disabled = true;
+            botonProcesar.textContent = 'Procesando...';
             botonDescargar.classList.add('hidden');
+            botonSubirHtml.disabled = true;
+            botonSubirCss.disabled = true;
 
             const leerHTML = new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -82,7 +155,7 @@
 
             Promise.all([leerHTML, leerCSS])
                 .then(([htmlContenido, cssContenido]) => {
-                    // --- Lógica de conversión (tu código original) ---
+                    // --- Lógica de conversión ---
                     try {
                         cssContenido = cssContenido.replace(/(ORCID)|(orcid)/gi, 'ORCID2');
                         const tipoRevistaMatch = htmlContenido.match(/class="como_citar">.*?class="cursivas">\s*([^<\s]+)/s);
@@ -142,8 +215,8 @@
     </g>
 </svg>`;
                         let nuevoHtml = htmlContenido;
-                        const regexParaReemplazarGlobal =/((<p class="orcid")|(<p class="ESTILOS-FINALES_ORCID" lang="es-ES")|(<p class="ORCID")|(<p class="ESTILOS-FINALES_orcid")|(<p class="adscripcion" lang="es-ES"><span class="Hiperv-nculo"))>.*?<\/p>/s;
-                       
+                        const regexParaReemplazarGlobal = /((<p class="orcid")|(<p class="ESTILOS-FINALES_ORCID" lang="es-ES")|(<p class="ORCID")|(<p class="ESTILOS-FINALES_orcid")|(<p class="adscripcion" lang="es-ES"><span class="Hiperv-nculo"))>.*?<\/p>/s;
+                        
                         let i = 0;
                         nuevoHtml = nuevoHtml.replace(regexParaReemplazarGlobal, (match) => {
                             const link = linkOrcid[i];
@@ -187,27 +260,34 @@
                         nombreArchivoProcesado = 'resultado.html';
                         tipoMimeProcesado = 'text/html';
 
-                        // Actualizar correctamente el estado de los botones
-                        botonSubir.disabled = false;
-                        botonSubir.textContent = 'Subir archivos';
+                        // Actualizar la interfaz de usuario
+                        botonProcesar.disabled = false;
+                        botonProcesar.textContent = 'Procesar y convertir';
                         botonDescargar.classList.remove('hidden');
+                        botonReiniciar.classList.remove('hidden');
+                        botonSubirHtml.disabled = false;
+                        botonSubirCss.disabled = false;
 
                     } catch (error) {
                         console.error("Error al procesar los archivos:", error);
                         console.log("Hubo un error al procesar los archivos. Por favor, asegúrate de haber subido los correctos. Detalles: " + error.message);
-                        botonSubir.disabled = false;
-                        botonSubir.textContent = 'Subir archivos';
+                        botonProcesar.disabled = false;
+                        botonProcesar.textContent = 'Procesar y convertir';
+                        botonSubirHtml.disabled = false;
+                        botonSubirCss.disabled = false;
                     }
                 })
                 .catch(error => {
                     console.error("Error al leer los archivos:", error);
                     console.log("Hubo un error al leer los archivos. Por favor, asegúrate de haber subido los correctos. Detalles: " + error.message);
-                    botonSubir.disabled = false;
-                    botonSubir.textContent = 'Subir archivos';
+                    botonProcesar.disabled = false;
+                    botonProcesar.textContent = 'Procesar y convertir';
+                    botonSubirHtml.disabled = false;
+                    botonSubirCss.disabled = false;
                 });
         }
 
-        // Función para descargar el archivo (sin cambios)
+        // Función para descargar el archivo
         function descargarArchivo() {
             if (archivoProcesado) {
                 const blob = new Blob([archivoProcesado], { type: tipoMimeProcesado });
@@ -224,31 +304,48 @@
             }
         }
 
+        // Función para reiniciar el estado de la aplicación
+        function reiniciarAplicacion() {
+            htmlFile = null;
+            cssFile = null;
+            archivoProcesado = null;
+            nombreArchivoProcesado = null;
+            tipoMimeProcesado = null;
+            inputHtml.value = '';
+            inputCss.value = '';
+            actualizarEstadoUI();
+            botonDescargar.classList.add('hidden');
+        }
+
         // Lógica de escucha de eventos
-        botonSubir.addEventListener('click', () => {
-            inputSubir.click();
+        botonSubirHtml.addEventListener('click', () => {
+            inputHtml.click();
+        });
+        
+        botonSubirCss.addEventListener('click', () => {
+            inputCss.click();
         });
 
-        inputSubir.addEventListener('change', (event) => {
-            const archivos = event.target.files;
-            if (archivos.length === 2) {
-                const htmlFile = Array.from(archivos).find(file => file.name.endsWith('.html'));
-                const cssFile = Array.from(archivos).find(file => file.name.endsWith('.css'));
-                
-                if (htmlFile && cssFile) {
-                    procesarArchivos(htmlFile, cssFile);
-                } else {
-                    console.log("Por favor, selecciona un archivo HTML y un archivo CSS.");
-                    inputSubir.value = '';
-                }
+        inputHtml.addEventListener('change', (event) => {
+            htmlFile = event.target.files[0];
+            actualizarEstadoUI();
+        });
+
+        inputCss.addEventListener('change', (event) => {
+            cssFile = event.target.files[0];
+            actualizarEstadoUI();
+        });
+        
+        botonProcesar.addEventListener('click', () => {
+            if (htmlFile && cssFile) {
+                procesarArchivos(htmlFile, cssFile);
             } else {
-                console.log("Por favor, selecciona exactamente dos archivos.");
-                inputSubir.value = '';
+                console.log("Faltan archivos por subir.");
             }
         });
 
-        // Evento para el nuevo botón de descarga
         botonDescargar.addEventListener('click', descargarArchivo);
+        botonReiniciar.addEventListener('click', reiniciarAplicacion);
     </script>
 
 </body>
