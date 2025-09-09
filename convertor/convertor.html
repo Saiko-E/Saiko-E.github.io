@@ -168,7 +168,7 @@
                         } else {
                             ubicacionOrcidMatch = cssContenido.match(/\.([^}]*autor[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
                         }
-                        const ubicacionTexto = ubicacionOrcidMatch ? ubicacionOrcidMatch[2] : 'center';
+                        const ubicacionTexto = ubicacionOrcidMatch ? ubicacionOrcidMatch[4] : 'center';
 
                         const orcidRegex = /https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}/g;
                         const linkOrcid = [...new Set(htmlContenido.match(orcidRegex) || [])];
