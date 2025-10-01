@@ -239,9 +239,17 @@
                         }
 
                         function aumentarMargen(match, direction, value, unit) {
-                            const nuevoValor = parseFloat(value) + 1;
-                            return `margin-${direction}: ${nuevoValor}${unit};`;
+                            const valorNumerico = parseFloat(value);
+                            let resultado;
+                            if (valorNumerico === 0) {
+                                resultado = `margin-${direction}: 1em;`;
+                            } else {
+                                const nuevoValor = valorNumerico + 1;
+                                resultado = `margin-${direction}: ${nuevoValor}${unit};`;
+                            }
+                            return resultado;
                         }
+
 
                         const cssModificado = bloqueCSS
                             .replace(/\s*(\d+)px;/g, pxToEm)
