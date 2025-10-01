@@ -231,8 +231,26 @@
 </p>`;
                             nuevoHtml = nuevoHtml.replace(regexParaReemplazar, textoVector.trim());
                         }
-
-                        const bloqueCSS = `<style>\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n${clasesVector}\n${cssContenido}\n</style>`;
+                        const estilosParaTablas = `
+                        /* Estilos para que las tablas ocupen todo el ancho */
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 1em;
+                            margin-bottom: 1em;
+                        }
+                        th, td {
+                            border: 1px solid #ccc;
+                            padding: 0.5em;
+                            text-align: left;
+                        }
+                        `;
+                        const bloqueCSS = `<style>\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n
+                            ${clasesVector}\n
+                            ${cssContenido}\n
+                            ${estilosParaTablas}\n
+                            </style>`;
+                            
                         function pxToEm(match, pxValue) {
                             const emValue = parseInt(pxValue) / 8;
                             return `${emValue.toFixed(1)}em;`;
