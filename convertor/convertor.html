@@ -233,20 +233,31 @@
                         }
 
                         const bloqueCSS = `<style>\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n${clasesVector}\n${cssContenido}\n</style>`;
-                        
                         function pxToEm(match, pxValue) {
                             const emValue = parseInt(pxValue) / 8;
                             return `${emValue.toFixed(1)}em;`;
                         }
 
-                        const cssFinal = bloqueCSS.replace(/\s*(\d+)px;/g, pxToEm);
+                        function aumentarMargen(match, direction, value, unit) {
+                            const nuevoValor = parseFloat(value) + 1;
+                            return `margin-${direction}: ${nuevoValor}${unit};`;
+                        }
+
+                        const cssModificado = bloqueCSS
+                            .replace(/\s*(\d+)px;/g, pxToEm)
+                            .replace(/margin-(top|bottom):\s*(\d+\.?\d*)(\w*);/g, aumentarMargen);
+
+                        const bloqueDeEstiloFinal = `<style>\n${cssModificado}\n</style>`;
 
                         const linkRegex = /<link[^>]+href="(?:.\/)?estilos\.css"[^>]*>/i;
+
                         if (nuevoHtml.match(linkRegex)) {
-                           nuevoHtml = nuevoHtml.replace(linkRegex, cssFinal);
+                        nuevoHtml = nuevoHtml.replace(linkRegex, bloqueDeEstiloFinal);
                         } else {
-                           nuevoHtml = nuevoHtml.replace(/(<\/head>)/i, `\n${cssFinal}\n$1`);
+                        nuevoHtml = nuevoHtml.replace(/(<\/head>)/i, `${bloqueDeEstiloFinal}\n$1`);
                         }
+
+       
 
                         nuevoHtml = nuevoHtml.replace(/<body([^>]*)>/i, `<body$1>\n<div class='contenedor'>`);
                         nuevoHtml = nuevoHtml.replace(/<\/body>/i, `</div>\n</body>`);
