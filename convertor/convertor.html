@@ -166,7 +166,7 @@
                         if (revista.includes('problema')) {
                             ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
                         } else {
-                            ubicacionOrcidMatch = cssContenido.match(/\.([^}]*autor[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
+                            ubicacionOrcidMatch = `flex-end`;
                         }
                         const ubicacionTexto = ubicacionOrcidMatch ? ubicacionOrcidMatch[4] : 'center';
 
@@ -236,10 +236,10 @@
                         
                         function pxToEm(match, pxValue) {
                             const emValue = parseInt(pxValue) / 8;
-                            return `font-size: ${emValue.toFixed(1)}em;`;
+                            return `${emValue.toFixed(1)}em;`;
                         }
 
-                        const cssFinal = bloqueCSS.replace(/font-size:\s*(\d+)px;/g, pxToEm);
+                        const cssFinal = bloqueCSS.replace(/\s*(\d+)px;/g, pxToEm);
 
                         const linkRegex = /<link[^>]+href="(?:.\/)?estilos\.css"[^>]*>/i;
                         if (nuevoHtml.match(linkRegex)) {
