@@ -163,8 +163,10 @@
                         console.log(`'${revista}'`);
 
                         let ubicacionOrcidMatch;
+                        let ubicacionTexto;
                         if (revista.includes('problema')) {
-                            ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
+                            const ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
+                            const valorEncontrado = ubicacionOrcidMatch?.[2];
                             if (!valorEncontrado || valorEncontrado === '-') {
                                 ubicacionTexto = 'flex-end';
                             } else {
@@ -174,7 +176,6 @@
                         } else {
                             ubicacionOrcidMatch = `flex-end`;
                         }
-                        const ubicacionTexto = ubicacionOrcidMatch ? ubicacionOrcidMatch[4] : 'center';
 
                         const orcidRegex = /https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}/g;
                         const linkOrcid = [...new Set(htmlContenido.match(orcidRegex) || [])];
@@ -240,12 +241,15 @@
                         const estilosParaTablas = `
                         /* Estilos para que las tablas ocupen todo el ancho */
                         table {
-                            width: 100%;
+                            width: auto;
+                            max-width: 100%;
                             border-collapse: collapse;
                             margin-top: 0;
                             margin-bottom: 0;
                             padding-left:0.5em;
                             padding-right:0.5em;
+                            margin-left: auto;
+                            margin-right: auto;
                         }
                         th, td {
                             border: 1px solid #ccc;
