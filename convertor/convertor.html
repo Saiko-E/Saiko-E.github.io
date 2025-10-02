@@ -236,8 +236,10 @@
                         table {
                             width: 100%;
                             border-collapse: collapse;
-                            margin-top: 1em;
-                            margin-bottom: 1em;
+                            margin-top: 0;
+                            margin-bottom: 0;
+                            padding-left:0.5em;
+                            padding-right:0.5em;
                         }
                         th, td {
                             border: 1px solid #ccc;
@@ -245,7 +247,7 @@
                             text-align: left;
                         }
                         `;
-                        const bloqueCSS = `<style>\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n
+                        const bloqueCSS = `\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n
                             ${clasesVector}\n
                             ${cssContenido}\n
                             ${estilosParaTablas}\n
