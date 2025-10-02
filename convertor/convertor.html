@@ -179,14 +179,32 @@
 
                         const orcidRegex = /https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}/g;
                         const linkOrcid = [...new Set(htmlContenido.match(orcidRegex) || [])];
+const estilosDatosAutor = `
+/* Estilos para agrupar datos de autor sin márgenes internos */
+.ORCID2 {
+    margin-bottom: 0.2em !important; /* Reduce espacio después del ORCID */
+    margin-top: 1.5em !important;    /* Asegura espacio entre diferentes autores (orcid a orcid) */
+}
 
+/* Anula los márgenes de los párrafos de afiliación/email que siguen al ORCID */
+.ORCID2 + p,
+.ORCID2 + p + p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    line-height: 1.4; /* Mejora la legibilidad al estar juntos */
+}
+
+/* Identifica el último párrafo de datos de autor antes del DOI */
+p:has(+ p.ESTILOS-FINALES_DOI) {
+    margin-bottom: 2em !important; /* Añade espacio entre los datos y el DOI */
+}
+`;
                         const clasesVector = `
 .ORCID2 {
     display: flex;
     justify-content: ${ubicacionTexto};
     align-items: center;
     gap: 0.5em; 
-    margin: 1em 0;
 }
 .ORCID2 ._idSVGInline {
     display: inline-block;
@@ -259,6 +277,7 @@
                         `;
                         const bloqueCSS = `\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n
                             ${clasesVector}\n
+                            ${estilosDatosAutor}\n
                             ${cssContenido}\n
                             ${estilosParaTablas}\n
                             </style>`;
@@ -272,9 +291,9 @@
                             const valorNumerico = parseFloat(value);
                             let resultado;
                             if (valorNumerico === 0) {
-                                resultado = `margin-${direction}: 1em;`;
+                                resultado = `margin-${direction}: 2em;`;
                             } else {
-                                const nuevoValor = valorNumerico + 1;
+                                const nuevoValor = valorNumerico + 2;
                                 resultado = `margin-${direction}: ${nuevoValor}${unit};`;
                             }
                             return resultado;
@@ -299,6 +318,9 @@
 
                         nuevoHtml = nuevoHtml.replace(/<body([^>]*)>/i, `<body$1>\n<div class='contenedor'>`);
                         nuevoHtml = nuevoHtml.replace(/<\/body>/i, `</div>\n</body>`);
+
+                        const regexNotasAlPie = /<span class="NOTA[^>]*>.*?<\span>/gs;
+                        nuevoHtml = nuevoHtml.replace(regexNotasAlPie,'');
 
                         // Guardar el resultado en variables globales para la descarga
                         archivoProcesado = nuevoHtml;
