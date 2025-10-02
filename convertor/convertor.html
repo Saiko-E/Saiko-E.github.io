@@ -165,6 +165,12 @@
                         let ubicacionOrcidMatch;
                         if (revista.includes('problema')) {
                             ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
+                            if (!valorEncontrado || valorEncontrado === '-') {
+                                ubicacionTexto = 'flex-end';
+                            } else {
+                                // Si se encontró un valor válido, lo usamos
+                                ubicacionTexto = valorEncontrado;
+                            }
                         } else {
                             ubicacionOrcidMatch = `flex-end`;
                         }
