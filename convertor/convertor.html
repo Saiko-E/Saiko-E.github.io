@@ -244,12 +244,12 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 const regexParaReemplazar = /<p class="((orcid|ORCID|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)"( lang="[^"]*")?|adscripcion"( lang="[^"]*")?><span class="Hiperv-nculo")>.*?<a href="(https?:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})">.*?<\/p>/sig;
 
 // Una sola llamada a .replace() hace todo el trabajo
-nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, clase, subClase, lang, linkCapturado) => {
+nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, clase, subClase, lang, linkOrcid) => {
     const textoVector = `
 <p class="ORCID2">
     <span class="_idSVGInline">${svgContent}</span>
-    <a href="${linkCapturado}">
-        <span class="Hiperv-nculo">${linkCapturado}</span>
+    <a href="${linkOrcid}">
+        <span class="Hiperv-nculo">${linkOrcid}</span>
     </a>
 </p>`;
     return textoVector.trim();
