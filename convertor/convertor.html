@@ -241,21 +241,32 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 </svg>`;
 
                         let nuevoHtml = htmlContenido;
-                        const regexParaReemplazar = /((<p class="orcid")|(<p class="ESTILOS-FINALES_ORCID")|(<p class="orcid" lang="en-US")|(<p class="ESTILOS-FINALES_ORCID" lang="es-ES")|(<p class="ORCID")|(<p class="ESTILOS-FINALES_orcid")|(<p class="adscripcion" lang="es-ES"><span class="Hiperv-nculo"))>.*?<\/p>/si;
-
+                        const regexParaReemplazar = /<p class="(?:orcid|ESTILOS-FINALES_ORCID|ORCID|ESTILOS-FINALES_orcid|ESTILOS-FINALES_AUTORES|adscripcion)"[^>]*>.*?<\/p>/gis;
                         // Itera sobre cada enlace ORCID y reemplaza la primera coincidencia en el HTML.
-                        // Esto replica la lógica del bucle de Python.
-                        for (let i = 0; i < linkOrcid.length; i++) {
-                            const link = linkOrcid[i];
-                            const textoVector = `
-<p class="ORCID2">
-    <span class="_idSVGInline">${svgContent}</span>
-    <a href="${link}">
-        <span class="Hiperv-nculo">${link}</span>
-    </a>
-</p>`;
-                            nuevoHtml = nuevoHtml.replace(regexParaReemplazar, textoVector.trim());
-                        }
+                        let orcidIndex = 0; // Un contador para usar los links de ORCID en orden
+                        const replacer = (match) => {
+                            // Asegurarnos de que todavía tenemos links de ORCID para asignar
+                            if (orcidIndex < linkOrcid.length) {
+                                const link = linkOrcid[orcidIndex];
+                                
+                                // Creamos el nuevo bloque de HTML para este autor específico
+                                const textoVector = `
+                        <p class="ORCID2">
+                            <span class="_idSVGInline">${svgContent}</span>
+                            <a href="${link}">
+                                <span class="Hiperv-nculo">${link}</span>
+                            </a>
+                        </p>`;
+                                
+                                orcidIndex++; // Incrementamos el contador para el próximo autor
+                                return textoVector.trim();
+                            }
+                            // Si la regex encuentra un párrafo pero ya no hay links ORCID, lo dejamos como estaba
+                            return match; 
+                        };
+
+                        // 3. Ejecutamos el reemplazo una sola vez para todo el documento
+                        nuevoHtml = nuevoHtml.replace(regexParaReemplazar, replacer);
                         const estilosParaTablas = `
                         /* Estilos para que las tablas ocupen todo el ancho */
                         table {
