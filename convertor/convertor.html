@@ -241,7 +241,7 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 </svg>`;
 
                         let nuevoHtml = htmlContenido;
-                        const regexParaReemplazar = /((<p class="orcid")|(<p class="orcid" lang="en-US")|(<p class="ESTILOS-FINALES_ORCID" lang="es-ES")|(<p class="ORCID")|(<p class="ESTILOS-FINALES_orcid")|(<p class="adscripcion" lang="es-ES"><span class="Hiperv-nculo"))>.*?<\/p>/si;
+                        const regexParaReemplazar = /((<p class="orcid")|(<p class="ESTILOS-FINALES_ORCID")|(<p class="orcid" lang="en-US")|(<p class="ESTILOS-FINALES_ORCID" lang="es-ES")|(<p class="ORCID")|(<p class="ESTILOS-FINALES_orcid")|(<p class="adscripcion" lang="es-ES"><span class="Hiperv-nculo"))>.*?<\/p>/si;
 
                         // Itera sobre cada enlace ORCID y reemplaza la primera coincidencia en el HTML.
                         // Esto replica la lógica del bucle de Python.
@@ -319,11 +319,12 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
                         nuevoHtml = nuevoHtml.replace(/<body([^>]*)>/i, `<body$1>\n<div class='contenedor'>`);
                         nuevoHtml = nuevoHtml.replace(/<\/body>/i, `</div>\n</body>`);
 
-                        const regexNotasAlPie = /<span class="NOTA[^>]*>.*?<\span>/gs;
-                        nuevoHtml = nuevoHtml.replace(regexNotasAlPie,'');
+                        const regexNotasAlPie = /(href=")[^#"]*(#[^"]*")/g;
+                        nuevoHtml = nuevoHtml.replace(regexNotasAlPie,'$1$2');
 
-                        const regexEspaciado = /<span class="no-separar[^>]*>.*?<\span>/gs;
-                        nuevoHtml = nuevoHtml.replace(regexEspaciado,'');
+
+                        
+                        nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\span>/g,'$1');
 
 
                         // Guardar el resultado en variables globales para la descarga
