@@ -241,32 +241,20 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 </svg>`;
 
                         let nuevoHtml = htmlContenido;
-                        const regexParaReemplazar = /<p class="(?:orcid|ESTILOS-FINALES_ORCID|ORCID|ESTILOS-FINALES_orcid|ESTILOS-FINALES_AUTORES|adscripcion)"[^>]*>.*?<\/p>/gis;
-                        // Itera sobre cada enlace ORCID y reemplaza la primera coincidencia en el HTML.
-                        let orcidIndex = 0; // Un contador para usar los links de ORCID en orden
-                        const replacer = (match) => {
-                            // Asegurarnos de que todavía tenemos links de ORCID para asignar
-                            if (orcidIndex < linkOrcid.length) {
-                                const link = linkOrcid[orcidIndex];
-                                
-                                // Creamos el nuevo bloque de HTML para este autor específico
-                                const textoVector = `
-                        <p class="ORCID2">
-                            <span class="_idSVGInline">${svgContent}</span>
-                            <a href="${link}">
-                                <span class="Hiperv-nculo">${link}</span>
-                            </a>
-                        </p>`;
-                                
-                                orcidIndex++; // Incrementamos el contador para el próximo autor
-                                return textoVector.trim();
-                            }
-                            // Si la regex encuentra un párrafo pero ya no hay links ORCID, lo dejamos como estaba
-                            return match; 
-                        };
+const regexParaReemplazar = /<p class="((orcid|ORCID|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)"( lang="[^"]*")?|adscripcion"( lang="[^"]*")?><span class="Hiperv-nculo")>.*?<a href="(https?:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})">.*?<\/p>/sig;
 
-                        // 3. Ejecutamos el reemplazo una sola vez para todo el documento
-                        nuevoHtml = nuevoHtml.replace(regexParaReemplazar, replacer);
+// Una sola llamada a .replace() hace todo el trabajo
+nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, clase, subClase, lang, linkCapturado) => {
+    const textoVector = `
+<p class="ORCID2">
+    <span class="_idSVGInline">${svgContent}</span>
+    <a href="${linkCapturado}">
+        <span class="Hiperv-nculo">${linkCapturado}</span>
+    </a>
+</p>`;
+    return textoVector.trim();
+});
+
                         const estilosParaTablas = `
                         /* Estilos para que las tablas ocupen todo el ancho */
                         table {
@@ -337,7 +325,7 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
                         
                         nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g,'$1');
                         nuevoHtml = nuevoHtml.replace(/&#160;/g,' ');
-                        nuevoHtml = nuevoHtml.replace(/ParaOverride-./g,'');
+                        nuevoHtml = nuevoHtml.replace(/ParaOverride-2/g,'');
 
 
                         // Guardar el resultado en variables globales para la descarga
