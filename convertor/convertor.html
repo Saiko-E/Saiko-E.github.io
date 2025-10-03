@@ -322,6 +322,9 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
                         const regexNotasAlPie = /<span class="NOTA[^>]*>.*?<\span>/gs;
                         nuevoHtml = nuevoHtml.replace(regexNotasAlPie,'');
 
+                        const regexEspaciado = /<span class="no-separar[^>]*>.*?<\span>/gs;
+
+
                         // Guardar el resultado en variables globales para la descarga
                         archivoProcesado = nuevoHtml;
                         nombreArchivoProcesado =  `r${htmlFile.name}`;
