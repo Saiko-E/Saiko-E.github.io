@@ -335,8 +335,9 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 
 
                         
-                        nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\span>/g,'$1');
-                        neuvoHtml = nuevoHtml.replace(/ParaOverride-./g,'')
+                        nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g,'$1');
+                        nuevoHtml = nuevoHtml.replace(/&#160;/g,' ');
+                        nuevoHtml = nuevoHtml.replace(/ParaOverride-./g,'');
 
 
                         // Guardar el resultado en variables globales para la descarga
