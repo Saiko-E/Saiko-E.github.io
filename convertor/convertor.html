@@ -323,6 +323,7 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
                         nuevoHtml = nuevoHtml.replace(regexNotasAlPie,'');
 
                         const regexEspaciado = /<span class="no-separar[^>]*>.*?<\span>/gs;
+                        nuevoHtml = nuevoHtml.replace(regexEspaciado,'');
 
 
                         // Guardar el resultado en variables globales para la descarga
