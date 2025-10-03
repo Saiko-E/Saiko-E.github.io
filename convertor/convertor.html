@@ -242,7 +242,7 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 
                         let nuevoHtml = htmlContenido;
 // 1. REEMPLAZA la vieja expresión regular con esta, que es más simple y robusta:
-const regexParaReemplazar = /<p class="[^"]*(?:orcid|ORCID|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID|adscripcion)[^"]*">.*?<a href="(https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})">.*?<\/p>/sig;
+const regexParaReemplazar = /<p class="[^"]*(?:orcid|ORCID|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID|adscripcion)[^"]*">.*?<a href="(https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*">.*?<\/p>/sig;
 
 // 2. REEMPLAZA la vieja llamada a .replace() con esta versión simplificada:
 nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, linkCapturado) => {
