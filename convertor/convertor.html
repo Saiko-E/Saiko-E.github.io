@@ -242,14 +242,17 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 
                         let nuevoHtml = htmlContenido;
 
-// 2. AÑADE ESTA LÍNEA PARA DECLARAR EL CONTADOR
 let orcidReemplazados = 0;
-const regexParaReemplazar = /(?:<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>.*?)(?:<span[^>]*>.*?<div[^>]*>.*?<\/div>.*?<\/span>)?(?:<a[^>]*href="(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*")[^>]*>.*?<\/a>(?:.*?<\/p>)/sig;
-// 3. El reemplazo con la función que usa los grupos nombrados.
+
+// La expresión regular, ahora sí completa, para que capture el párrafo entero.
+const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>.*?<a[^>]*href="(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*">.*?<\/p>/sig;
+
 nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
     orcidReemplazados++;
     const groups = args.pop();
     const linkCapturado = groups.link.trim();
+
+    console.log(`ORCID Encontrado #${orcidReemplazados}: ${linkCapturado}`);
 
     const textoVector = `
 <p class="ORCID2">
@@ -261,7 +264,6 @@ nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
     return textoVector.trim();
 });
 
-// 4. El log final para saber si encontró algo o no.
 if (orcidReemplazados === 0) {
     console.log("ADVERTENCIA: La expresión regular para ORCID no encontró ninguna coincidencia en el HTML.");
 }
