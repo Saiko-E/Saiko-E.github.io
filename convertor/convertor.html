@@ -241,19 +241,17 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 </svg>`;
 
                         let nuevoHtml = htmlContenido;
-// --- INICIA BLOQUE PARA REEMPLAZAR ---
+const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>.*?<a[^>]*href="(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*"/sig;
 
-// 1. La expresión regular definitiva y robusta.
-// 1. La expresión regular que combina TODOS los casos que hemos visto.
-const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion)[^"]*"[^>]*>.*?<a[^>]*href="(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*"/sig;
+// 2. AÑADE ESTA LÍNEA PARA DECLARAR EL CONTADOR
+let orcidReemplazados = 0;
 
-// 2. La función de reemplazo que utiliza grupos nombrados para ser a prueba de errores.
+// 3. El reemplazo con la función que usa los grupos nombrados.
 nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
-    // Obtenemos los grupos por nombre para evitar errores de posición.
+    orcidReemplazados++;
     const groups = args.pop();
-    const linkCapturado = groups.link.trim(); // Accedemos al enlace por su nombre "link"
+    const linkCapturado = groups.link.trim();
 
-    // Construimos el bloque HTML de reemplazo.
     const textoVector = `
 <p class="ORCID2">
     <span class="_idSVGInline">${svgContent}</span>
@@ -264,11 +262,10 @@ nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
     return textoVector.trim();
 });
 
-// 3. Un log final para saber si encontró algo o no.
+// 4. El log final para saber si encontró algo o no.
 if (orcidReemplazados === 0) {
     console.log("ADVERTENCIA: La expresión regular para ORCID no encontró ninguna coincidencia en el HTML.");
 }
-
 // --- TERMINA BLOQUE PARA REEMPLAZAR ---
 
                         const estilosParaTablas = `
