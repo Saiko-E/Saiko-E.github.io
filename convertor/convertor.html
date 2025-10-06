@@ -241,11 +241,10 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 </svg>`;
 
                         let nuevoHtml = htmlContenido;
-const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>.*?<a[^>]*href="(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*"/sig;
 
 // 2. AÑADE ESTA LÍNEA PARA DECLARAR EL CONTADOR
 let orcidReemplazados = 0;
-
+const regexParaReemplazar = /(?:<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>.*?)(?:<span[^>]*>.*?<div[^>]*>.*?<\/div>.*?<\/span>)?(?:<a[^>]*href="(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*")[^>]*>.*?<\/a>(?:.*?<\/p>)/sig;
 // 3. El reemplazo con la función que usa los grupos nombrados.
 nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
     orcidReemplazados++;
