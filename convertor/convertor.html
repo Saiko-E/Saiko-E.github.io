@@ -339,7 +339,7 @@ if (orcidReemplazados === 0) {
                         
                         nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g,'$1');
                         nuevoHtml = nuevoHtml.replace(/&#160;/g,' ');
-                        nuevoHtml = nuevoHtml.replace(/ParaOverride-2/g,'');
+                        nuevoHtml = nuevoHtml.replace(/ParaOverride-[2,1]/g,'');
 
 
                         // Guardar el resultado en variables globales para la descarga
