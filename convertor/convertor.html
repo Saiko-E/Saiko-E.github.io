@@ -244,24 +244,21 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 // --- INICIA BLOQUE PARA REEMPLAZAR ---
 
 // 1. La expresión regular definitiva y robusta.
-const regexParaReemplazar = /<p class="[^"]*(?:orcid|ORCID|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID|adscripcion)[^"]*">.*?<a href="(https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*">.*?<\/p>/sig;
+// 1. La expresión regular que combina TODOS los casos que hemos visto.
+const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion)[^"]*"[^>]*>.*?<a[^>]*href="(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*"/sig;
 
-// Variable para contar cuántas veces se ejecuta el reemplazo.
-let orcidReemplazados = 0;
+// 2. La función de reemplazo que utiliza grupos nombrados para ser a prueba de errores.
+nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
+    // Obtenemos los grupos por nombre para evitar errores de posición.
+    const groups = args.pop();
+    const linkCapturado = groups.link.trim(); // Accedemos al enlace por su nombre "link"
 
-// 2. El reemplazo con la función simplificada y un 'console.log' para depurar.
-nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, linkCapturado) => {
-    orcidReemplazados++; // Aumentamos el contador
-    console.log(`ORCID Encontrado #${orcidReemplazados}: ${linkCapturado.trim()}`); // Mostramos en consola el link que encontramos
-
-    // Usamos .trim() para quitar cualquier espacio en blanco al inicio o final del enlace
-    const linkLimpio = linkCapturado.trim();
-
+    // Construimos el bloque HTML de reemplazo.
     const textoVector = `
 <p class="ORCID2">
     <span class="_idSVGInline">${svgContent}</span>
-    <a href="${linkLimpio}">
-        <span class="Hiperv-nculo">${linkLimpio}</span>
+    <a href="${linkCapturado}">
+        <span class="Hiperv-nculo">${linkCapturado}</span>
     </a>
 </p>`;
     return textoVector.trim();
