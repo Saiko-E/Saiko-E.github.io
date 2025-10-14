@@ -160,6 +160,13 @@
                         cssContenido = cssContenido.replace(/(ORCID)|(orcid)/gi, 'ORCID2');
                         const tipoRevistaMatch = htmlContenido.match(/class="como_citar">.*?class="cursivas">\s*([^<\s]+)/s);
                         const revista = tipoRevistaMatch ? tipoRevistaMatch[1].toLowerCase() : '';
+                        const revistaCompletaMatch = htmlContenido.match(/class="como_citar">\s*<p class="cursivas">\s*([^<]+)/s);
+                        const revistaCompleta = revistaCompletaMatch ? revistaCompletaMatch[1].trim() : '';
+                        if (revistaCompletaMatch) {
+                            revistaCompleta = revistaCompletaMatch[1];
+                            revistaCompleta = revistaCompleta.replace(/<[^>]*>/g, '').trim();
+                        }
+                        
                         console.log(`'${revista}'`);
 
                         let ubicacionOrcidMatch;
@@ -167,6 +174,7 @@
                         let nuevoHtml = htmlContenido;
                         nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g,'$1');
                         nuevoHtml = nuevoHtml.replace(/&#160;/g,' ');
+                        const tiporevista = /https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}/g;
                         if (revista.includes('problema')) {
                             const ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
                             const valorEncontrado = ubicacionOrcidMatch?.[2];
@@ -176,7 +184,9 @@
                                 // Si se encontró un valor válido, lo usamos
                                 ubicacionTexto = valorEncontrado;
                             }
-                        } else if(revista.includes('Revista Mexicana de Derecho Constitucional')){
+                        } else if(revistaCompleta.includes('Revista Mexicana de Derecho Constitucional')){
+                            ubicacionTexto = `center`;
+                        }else if(revistaCompleta.includes('Estudios en derecho a la información')){
                             ubicacionTexto = `center`;
                         }
                         else {
