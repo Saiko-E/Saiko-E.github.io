@@ -164,6 +164,9 @@
 
                         let ubicacionOrcidMatch;
                         let ubicacionTexto;
+                        let nuevoHtml = htmlContenido;
+                        nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g,'$1');
+                        nuevoHtml = nuevoHtml.replace(/&#160;/g,' ');
                         if (revista.includes('problema')) {
                             const ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
                             const valorEncontrado = ubicacionOrcidMatch?.[2];
@@ -173,7 +176,7 @@
                                 // Si se encontró un valor válido, lo usamos
                                 ubicacionTexto = valorEncontrado;
                             }
-                        } else if(revista.incluedes('Revista Mexicana de Derecho Constitucional')){
+                        } else if(revista.includes('Revista Mexicana de Derecho Constitucional')){
                             ubicacionTexto = `center`;
                         }
                         else {
@@ -243,7 +246,7 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
     </g>
 </svg>`;
 
-                        let nuevoHtml = htmlContenido;
+                        
 
 let orcidReemplazados = 0;
 
@@ -339,8 +342,7 @@ if (orcidReemplazados === 0) {
 
 
                         
-                        nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g,'$1');
-                        nuevoHtml = nuevoHtml.replace(/&#160;/g,' ');
+                        
                         nuevoHtml = nuevoHtml.replace(/ParaOverride-[2,1]/g,'');
 
 
