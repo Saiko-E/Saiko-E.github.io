@@ -173,7 +173,10 @@
                                 // Si se encontró un valor válido, lo usamos
                                 ubicacionTexto = valorEncontrado;
                             }
-                        } else {
+                        } else if(revista.incluedes('Revista Mexicana de Derecho Constitucional')){
+                            ubicacionTexto=`flex-end`;
+                        }
+                        else {
                             ubicacionTexto = `flex-end`;
                         }
 
