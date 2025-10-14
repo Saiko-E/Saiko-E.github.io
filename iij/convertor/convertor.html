@@ -262,7 +262,7 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 let orcidReemplazados = 0;
 
 // La expresión regular, ahora sí completa, para que capture el párrafo entero.
-const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion|juridicas-grande_orcid|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?<a[^>]*href="(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})\s*">(?:(?!<\/p>).)*?<\/p>/sig;
+const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})(?:(?!<\/p>).)*?<\/p>/sig;
 nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
     orcidReemplazados++;
     const groups = args.pop();
