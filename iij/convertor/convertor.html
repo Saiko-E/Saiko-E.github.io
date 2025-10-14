@@ -194,7 +194,7 @@
                             ubicacionTexto = `flex-end`;
                         }
 
-                        const orcidRegex = /https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}/g;
+                        const orcidRegex = /https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-[0-9X]{4}/g;
                         const linkOrcid = [...new Set(htmlContenido.match(orcidRegex) || [])];
 const estilosDatosAutor = `
 /* Estilos para agrupar datos de autor sin márgenes internos */
@@ -262,8 +262,9 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 let orcidReemplazados = 0;
 
 // La expresión regular, ahora sí completa, para que capture el párrafo entero.
-const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4})(?:(?!<\/p>).)*?<\/p>/sig;
-nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
+// La expresión regular, ahora sí completa, para que capture el párrafo entero.
+// Cambio en el último cuarteto: ahora acepta \d{4} o \d{3}[0-9X]
+const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-[0-9X]{4})(?:(?!<\/p>).)*?<\/p>/sig;nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
     orcidReemplazados++;
     const groups = args.pop();
     const linkCapturado = groups.link.trim();
