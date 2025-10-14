@@ -264,7 +264,7 @@ let orcidReemplazados = 0;
 // La expresión regular, ahora sí completa, para que capture el párrafo entero.
 // La expresión regular, ahora sí completa, para que capture el párrafo entero.
 // Cambio en el último cuarteto: ahora acepta \d{4} o \d{3}[0-9X]
-const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|REV-DER-SOCIAL_orcid|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-[0-9X]{4})(?:(?!<\/p>).)*?<\/p>/sig;nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
+const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|REV-DER-SOCIAL_orcid|REV-DER-SOCIAL_doi|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-[0-9X]{4})(?:(?!<\/p>).)*?<\/p>/sig;nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
     orcidReemplazados++;
     const groups = args.pop();
     const linkCapturado = groups.link.trim();
