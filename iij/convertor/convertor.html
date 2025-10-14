@@ -164,6 +164,9 @@
 
                         let ubicacionOrcidMatch;
                         let ubicacionTexto;
+                        let nuevoHtml = htmlContenido;
+                        nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g,'$1');
+                        nuevoHtml = nuevoHtml.replace(/&#160;/g,' ');
                         if (revista.includes('problema')) {
                             const ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
                             const valorEncontrado = ubicacionOrcidMatch?.[2];
@@ -243,8 +246,7 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
     </g>
 </svg>`;
 
-                        let nuevoHtml = htmlContenido;
-
+                        
 let orcidReemplazados = 0;
 
 // La expresión regular, ahora sí completa, para que capture el párrafo entero.
@@ -339,8 +341,7 @@ if (orcidReemplazados === 0) {
 
 
                         
-                        nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g,'$1');
-                        nuevoHtml = nuevoHtml.replace(/&#160;/g,' ');
+                        
                         nuevoHtml = nuevoHtml.replace(/ParaOverride-[2,1]/g,'');
 
 
