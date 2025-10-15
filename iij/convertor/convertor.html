@@ -76,127 +76,151 @@
     </div>
 
     <script>
-        // Variables de estado
-        let htmlFile = null;
-        let cssFile = null;
-        let archivoProcesado = null;
-        let nombreArchivoProcesado = null;
-        let tipoMimeProcesado = null;
+    // Variables de estado
+    let htmlFile = null;
+    let cssFile = null;
+    let archivoProcesado = null;
+    let nombreArchivoProcesado = null;
+    let tipoMimeProcesado = null;
 
-        // Elementos del DOM
-        const inputHtml = document.getElementById('input-html');
-        const inputCss = document.getElementById('input-css');
-        const botonSubirHtml = document.getElementById('boton-subir-html');
-        const botonSubirCss = document.getElementById('boton-subir-css');
-        const botonProcesar = document.getElementById('boton-procesar');
-        const botonDescargar = document.getElementById('boton-descargar');
-        const botonReiniciar = document.getElementById('boton-reiniciar');
-        const estadoHtml = document.getElementById('estado-html');
-        const estadoCss = document.getElementById('estado-css');
+    // Elementos del DOM
+    const inputHtml = document.getElementById('input-html');
+    const inputCss = document.getElementById('input-css');
+    const botonSubirHtml = document.getElementById('boton-subir-html');
+    const botonSubirCss = document.getElementById('boton-subir-css');
+    const botonProcesar = document.getElementById('boton-procesar');
+    const botonDescargar = document.getElementById('boton-descargar');
+    const botonReiniciar = document.getElementById('boton-reiniciar');
+    const estadoHtml = document.getElementById('estado-html');
+    const estadoCss = document.getElementById('estado-css');
 
-        function actualizarEstadoUI() {
-            // Actualiza el estado visual de los archivos subidos
-            if (htmlFile) {
-                estadoHtml.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Archivo HTML: ${htmlFile.name}</span>`;
-                estadoHtml.classList.remove('text-red-500');
-                estadoHtml.classList.add('text-green-500');
-            } else {
-                estadoHtml.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg><span>Archivo HTML: No subido</span>`;
-                estadoHtml.classList.add('text-red-500');
-                estadoHtml.classList.remove('text-green-500');
-            }
-
-            if (cssFile) {
-                estadoCss.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Archivo CSS: ${cssFile.name}</span>`;
-                estadoCss.classList.remove('text-red-500');
-                estadoCss.classList.add('text-green-500');
-            } else {
-                estadoCss.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg><span>Archivo CSS: No subido</span>`;
-                estadoCss.classList.add('text-red-500');
-                estadoCss.classList.remove('text-green-500');
-            }
-
-            // Habilita el botón de procesar si ambos archivos están subidos
-            if (htmlFile && cssFile) {
-                botonProcesar.disabled = false;
-            } else {
-                botonProcesar.disabled = true;
-            }
-
-            // Muestra el botón de reiniciar si al menos un archivo está subido
-            if (htmlFile || cssFile) {
-                botonReiniciar.classList.remove('hidden');
-            } else {
-                botonReiniciar.classList.add('hidden');
-            }
+    function actualizarEstadoUI() {
+        // Actualiza el estado visual de los archivos subidos
+        if (htmlFile) {
+            estadoHtml.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Archivo HTML: ${htmlFile.name}</span>`;
+            estadoHtml.classList.remove('text-red-500');
+            estadoHtml.classList.add('text-green-500');
+        } else {
+            estadoHtml.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg><span>Archivo HTML: No subido</span>`;
+            estadoHtml.classList.add('text-red-500');
+            estadoHtml.classList.remove('text-green-500');
         }
 
-        // Función para procesar los archivos
-        function procesarArchivos(htmlFile, cssFile) {
-            botonProcesar.disabled = true;
-            botonProcesar.textContent = 'Procesando...';
-            botonDescargar.classList.add('hidden');
-            botonSubirHtml.disabled = true;
-            botonSubirCss.disabled = true;
+        if (cssFile) {
+            estadoCss.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Archivo CSS: ${cssFile.name}</span>`;
+            estadoCss.classList.remove('text-red-500');
+            estadoCss.classList.add('text-green-500');
+        } else {
+            estadoCss.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg><span>Archivo CSS: No subido</span>`;
+            estadoCss.classList.add('text-red-500');
+            estadoCss.classList.remove('text-green-500');
+        }
 
-            const leerHTML = new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.onerror = (e) => reject(e);
-                reader.readAsText(htmlFile);
-            });
+        // Habilita el botón de procesar si ambos archivos están subidos
+        botonProcesar.disabled = !(htmlFile && cssFile);
 
-            const leerCSS = new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.onerror = (e) => reject(e);
-                reader.readAsText(cssFile);
-            });
+        // Muestra el botón de reiniciar si al menos un archivo está subido
+        if (htmlFile || cssFile) {
+            botonReiniciar.classList.remove('hidden');
+        } else {
+            botonReiniciar.classList.add('hidden');
+        }
+    }
 
-            Promise.all([leerHTML, leerCSS])
-                .then(([htmlContenido, cssContenido]) => {
+    // Función para procesar los archivos
+    function procesarArchivos(htmlFile, cssFile) {
+        botonProcesar.disabled = true;
+        botonProcesar.textContent = 'Procesando...';
+        botonDescargar.classList.add('hidden');
+        botonSubirHtml.disabled = true;
+        botonSubirCss.disabled = true;
+
+        const leerHTML = new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsText(htmlFile);
+        });
+
+        const leerCSS = new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsText(cssFile);
+        });
+
+        Promise.all([leerHTML, leerCSS])
+            .then(([htmlContenido, cssContenido]) => {
+                try {
                     // --- Lógica de conversión ---
-                    try {
-                        cssContenido = cssContenido.replace(/(ORCID)|(orcid)/gi, 'ORCID2');
-                        const tipoRevistaMatch = htmlContenido.match(/class="como_citar">.*?class="cursivas">\s*([^<\s]+)/s);
-                        const revista = tipoRevistaMatch ? tipoRevistaMatch[1].toLowerCase() : '';
-                        const revistaCompletaMatch = htmlContenido.match(/class="como_citar">\s*<p class="cursivas">\s*([^<]+)/s);
-                        const revistaCompleta = revistaCompletaMatch ? revistaCompletaMatch[1].trim() : '';
-                        if (revistaCompletaMatch) {
-                            revistaCompleta = revistaCompletaMatch[1];
-                            revistaCompleta = revistaCompleta.replace(/<[^>]*>/g, '').trim();
-                        }
+                    cssContenido = cssContenido.replace(/(ORCID)|(orcid)/gi, 'ORCID2');
+
+                    const tipoRevistaMatch = htmlContenido.match(/class="como_citar">.*?class="cursivas">\s*([^<\s]+)/s);
+                    const revista = tipoRevistaMatch ? tipoRevistaMatch[1].toLowerCase() : '';
+
+                    const revistaCompletaMatch = htmlContenido.match(/class="como_citar">\s*<p class="cursivas">\s*([^<]+)/s);
+                    let revistaCompleta = revistaCompletaMatch ? revistaCompletaMatch[1].trim() : '';
+                    if (revistaCompletaMatch) {
+                        revistaCompleta = revistaCompletaMatch[1].replace(/<[^>]*>/g, '').trim();
+                    }
+
+                    console.log(`Revista corta: '${revista}'`);
+                    console.log(`Revista completa: '${revistaCompleta}'`);
+
+                    let ubicacionTexto;
+                    if (revista.includes('problema')) {
+                        const ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
+                        const valorEncontrado = ubicacionOrcidMatch ? .[2];
+                        ubicacionTexto = (!valorEncontrado || valorEncontrado === '-') ? 'flex-end' : valorEncontrado;
+                    } else if (revistaCompleta.includes('Revista Mexicana de Derecho Constitucional') || revistaCompleta.includes('Estudios en derecho a la información')) {
+                        ubicacionTexto = `center`;
+                    } else {
+                        ubicacionTexto = `flex-end`;
+                    }
+
+                    let nuevoHtml = htmlContenido;
+                    nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g, '$1');
+                    nuevoHtml = nuevoHtml.replace(/&#160;/g, ' ');
+
+                    // --- INICIO: NUEVA LÓGICA PARA EXTRAER ESTILOS DEL DOI ---
+                    let doiFontFamily = 'inherit'; // Valor por defecto
+                    let doiFontSize = '1em'; // Valor por defecto
+
+                    const doiClassMatch = htmlContenido.match(/<p\s+class="([^"]+)"[^>]*>.*?https?:\/\/doi\.org.*?</s);
+                    if (doiClassMatch && doiClassMatch[1]) {
+                        // Obtenemos la primera clase de la lista
+                        const doiClassName = doiClassMatch[1].trim().split(' ')[0];
+                        console.log(`Clase del DOI encontrada: .${doiClassName}`);
                         
-                        console.log(`'${revista}'`);
-                        console.log(`'${revistaCompleta}'`);
+                        // Escapamos el nombre de la clase para usarlo en la expresión regular
+                        const escapedDoiClassName = doiClassName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                        const cssRuleRegex = new RegExp(`\\.${escapedDoiClassName}[^\\{]*\\{([^\\}]+)\\}`, 'i');
+                        const cssRuleMatch = cssContenido.match(cssRuleRegex);
 
-                        let ubicacionOrcidMatch;
-                        let ubicacionTexto;
-                        let nuevoHtml = htmlContenido;
-                        nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g,'$1');
-                        nuevoHtml = nuevoHtml.replace(/&#160;/g,' ');
-                        const tiporevista = /https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}/g;
-                        if (revista.includes('problema')) {
-                            const ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
-                            const valorEncontrado = ubicacionOrcidMatch?.[2];
-                            if (!valorEncontrado || valorEncontrado === '-') {
-                                ubicacionTexto = 'flex-end';
-                            } else {
-                                // Si se encontró un valor válido, lo usamos
-                                ubicacionTexto = valorEncontrado;
+                        if (cssRuleMatch && cssRuleMatch[1]) {
+                            const ruleContent = cssRuleMatch[1];
+                            console.log(`Regla CSS encontrada para el DOI: ${ruleContent}`);
+
+                            const fontFamilyMatch = ruleContent.match(/font-family:\s*([^;]+)/i);
+                            if (fontFamilyMatch && fontFamilyMatch[1]) {
+                                doiFontFamily = fontFamilyMatch[1].trim();
+                                console.log(`Font-family del DOI extraído: ${doiFontFamily}`);
                             }
-                        } else if(revistaCompleta.includes('Revista Mexicana de Derecho Constitucional')){
-                            ubicacionTexto = `center`;
-                        }else if(revistaCompleta.includes('Estudios en derecho a la información')){
-                            ubicacionTexto = `center`;
-                        }
-                        else {
-                            ubicacionTexto = `flex-end`;
-                        }
 
-                        const orcidRegex = /https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-[0-9X]{4}/g;
-                        const linkOrcid = [...new Set(htmlContenido.match(orcidRegex) || [])];
-const estilosDatosAutor = `
+                            const fontSizeMatch = ruleContent.match(/font-size:\s*([^;]+)/i);
+                            if (fontSizeMatch && fontSizeMatch[1]) {
+                                doiFontSize = fontSizeMatch[1].trim();
+                                console.log(`Font-size del DOI extraído: ${doiFontSize}`);
+                            }
+                        } else {
+                            console.log(`Advertencia: No se encontró una regla CSS para la clase .${doiClassName}`);
+                        }
+                    } else {
+                        console.log("Advertencia: No se encontró el párrafo con el DOI para extraer su clase.");
+                    }
+                    // --- FIN: NUEVA LÓGICA PARA EXTRAER ESTILOS DEL DOI ---
+                    
+                    const estilosDatosAutor = `
 /* Estilos para agrupar datos de autor sin márgenes internos */
 .ORCID2 {
     margin-bottom: 0.2em !important; /* Reduce espacio después del ORCID */
@@ -214,9 +238,9 @@ const estilosDatosAutor = `
 /* Identifica el último párrafo de datos de autor antes del DOI */
 p:has(+ p.ESTILOS-FINALES_DOI) {
     margin-bottom: 2em !important; /* Añade espacio entre los datos y el DOI */
-}
-`;
-                        const clasesVector = `
+}`;
+                    
+                    const clasesVector = `
 .ORCID2 {
     display: flex;
     justify-content: ${ubicacionTexto};
@@ -236,219 +260,174 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 .ORCID2 a {
     text-decoration: none;
     color: inherit;
-    font-size: 1em;
+    font-family: ${doiFontFamily}; /* Aplicado desde la clase del DOI */
+    font-size: ${doiFontSize};   /* Aplicado desde la clase del DOI */
 }`;
 
-                        const svgContent = `
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-    viewBox="0 0 256 256" xml:space="preserve">
-    <style type="text/css">
-        .st0 { fill: #A6CE39; }
-        .st1 { fill: #FFFFFF; }
-    </style>
-    <circle class="st0" cx="128" cy="128" r="128" />
-    <g>
-        <path class="st1" d="M86.3,186.2H70.9V79.1h15.4v48.4V186.2z" />
-        <path class="st1" d="M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z
-            M124.3,172.4h24.5c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z" />
-        <path class="st1" d="M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1
-            c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z" />
-    </g>
-</svg>`;
+                    const svgContent = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 256 256" xml:space="preserve"> <style type="text/css"> .st0{fill:#A6CE39;} .st1{fill:#FFFFFF;} </style> <circle class="st0" cx="128" cy="128" r="128"/> <g> <path class="st1" d="M86.3,186.2H70.9V79.1h15.4v48.4V186.2z"/> <path class="st1" d="M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z M124.3,172.4h24.5c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z"/> <path class="st1" d="M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1 c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z"/> </g> </svg>`;
 
+                    let orcidReemplazados = 0;
+                    const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|REV-DER-SOCIAL_orcid|REV-DER-SOCIAL_doi|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-[0-9X]{4})(?:(?!<\/p>).)*?<\/p>/sig;
+                    
+                    nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
+                        orcidReemplazados++;
+                        const groups = args.pop();
+                        const linkCapturado = groups.link.trim();
+                        console.log(`ORCID Encontrado #${orcidReemplazados}: ${linkCapturado}`);
                         
-
-let orcidReemplazados = 0;
-
-// La expresión regular, ahora sí completa, para que capture el párrafo entero.
-// La expresión regular, ahora sí completa, para que capture el párrafo entero.
-// Cambio en el último cuarteto: ahora acepta \d{4} o \d{3}[0-9X]
-const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|REV-DER-SOCIAL_orcid|REV-DER-SOCIAL_doi|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-[0-9X]{4})(?:(?!<\/p>).)*?<\/p>/sig;nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
-    orcidReemplazados++;
-    const groups = args.pop();
-    const linkCapturado = groups.link.trim();
-
-    console.log(`ORCID Encontrado #${orcidReemplazados}: ${linkCapturado}`);
-
-    const textoVector = `
+                        return `
 <p class="ORCID2">
     <span class="_idSVGInline">${svgContent}</span>
     <a href="${linkCapturado}">
         <span class="Hiperv-nculo">${linkCapturado}</span>
     </a>
-</p>`;
-    return textoVector.trim();
-});
+</p>`.trim();
+                    });
 
-if (orcidReemplazados === 0) {
-    console.log("ADVERTENCIA: La expresión regular para ORCID no encontró ninguna coincidencia en el HTML.");
-}
-// --- TERMINA BLOQUE PARA REEMPLAZAR ---
-
-                        const estilosParaTablas = `
-                        /* Estilos para que las tablas ocupen todo el ancho */
-                        table {
-                            width: auto;
-                            max-width: 100%;
-                            border-collapse: collapse;
-                            margin-top: 0;
-                            margin-bottom: 0;
-                            padding-left:0.5em;
-                            padding-right:0.5em;
-                            margin-left: auto;
-                            margin-right: auto;
-                        }
-                        th, td {
-                            border: 1px solid #ccc;
-                            padding: 0.5em;
-                            text-align: left;
-                        }
-                        `;
-                        const bloqueCSS = `\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n
-                            ${clasesVector}\n
-                            ${estilosDatosAutor}\n
-                            ${cssContenido}\n
-                            ${estilosParaTablas}\n
-                            </style>`;
-                            
-                        function pxToEm(match, pxValue) {
-                            const emValue = parseInt(pxValue) / 9;
-                            return `${emValue.toFixed(1)}em;`;
-                        }
-
-                        function aumentarMargen(match, direction, value, unit) {
-                            const valorNumerico = parseFloat(value);
-                            let resultado;
-                            if (valorNumerico === 0) {
-                                resultado = `margin-${direction}: 2em;`;
-                            } else {
-                                const nuevoValor = valorNumerico + 2;
-                                resultado = `margin-${direction}: ${nuevoValor}${unit};`;
-                            }
-                            return resultado;
-                        }
-
-
-                        const cssModificado = bloqueCSS
-                            .replace(/\s*(\d+)px;/g, pxToEm)
-                            .replace(/margin-(top|bottom):\s*(\d+\.?\d*)(\w*);/g, aumentarMargen);
-
-                        const bloqueDeEstiloFinal = `<style>\n${cssModificado}\n</style>`;
-
-                        const linkRegex = /<link[^>]+href="(?:.\/)?estilos\.css"[^>]*>/i;
-
-                        if (nuevoHtml.match(linkRegex)) {
-                        nuevoHtml = nuevoHtml.replace(linkRegex, bloqueDeEstiloFinal);
-                        } else {
-                        nuevoHtml = nuevoHtml.replace(/(<\/head>)/i, `${bloqueDeEstiloFinal}\n$1`);
-                        }
-
-       
-
-                        nuevoHtml = nuevoHtml.replace(/<body([^>]*)>/i, `<body$1>\n<div class='contenedor'>`);
-                        nuevoHtml = nuevoHtml.replace(/<\/body>/i, `</div>\n</body>`);
-
-                        const regexNotasAlPie = /(href=")[^#"]*(#[^"]*")/g;
-                        nuevoHtml = nuevoHtml.replace(regexNotasAlPie,'$1$2');
-
-
-                        
-                        
-                        nuevoHtml = nuevoHtml.replace(/ParaOverride-[2,1]/g,'');
-
-
-                        // Guardar el resultado en variables globales para la descarga
-                        archivoProcesado = nuevoHtml;
-                        nombreArchivoProcesado =  `r${htmlFile.name}`;
-                        tipoMimeProcesado = 'text/html';
-
-                        // Actualizar la interfaz de usuario
-                        botonProcesar.disabled = false;
-                        botonProcesar.textContent = 'Procesar y convertir';
-                        botonDescargar.classList.remove('hidden');
-                        botonReiniciar.classList.remove('hidden');
-                        botonSubirHtml.disabled = false;
-                        botonSubirCss.disabled = false;
-
-                    } catch (error) {
-                        console.error("Error al procesar los archivos:", error);
-                        console.log("Hubo un error al procesar los archivos. Por favor, asegúrate de haber subido los correctos. Detalles: " + error.message);
-                        botonProcesar.disabled = false;
-                        botonProcesar.textContent = 'Procesar y convertir';
-                        botonSubirHtml.disabled = false;
-                        botonSubirCss.disabled = false;
+                    if (orcidReemplazados === 0) {
+                        console.log("ADVERTENCIA: La expresión regular para ORCID no encontró ninguna coincidencia en el HTML.");
                     }
-                })
-                .catch(error => {
-                    console.error("Error al leer los archivos:", error);
-                    console.log("Hubo un error al leer los archivos. Por favor, asegúrate de haber subido los correctos. Detalles: " + error.message);
+
+                    const estilosParaTablas = `
+/* Estilos para que las tablas ocupen todo el ancho */
+table {
+    width: auto;
+    max-width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 0.5em;
+    text-align: left;
+}`;
+                    const bloqueCSS = `\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n${clasesVector}\n${estilosDatosAutor}\n${cssContenido}\n${estilosParaTablas}\n`;
+
+                    function pxToEm(match, pxValue) {
+                        const emValue = parseInt(pxValue) / 9;
+                        return `${emValue.toFixed(1)}em;`;
+                    }
+                    
+                    // --- CAMBIO: SE ELIMINA LA FUNCIÓN Y LA LLAMADA A aumentarMargen ---
+                    const cssModificado = bloqueCSS.replace(/\s*(\d+)px;/g, pxToEm);
+
+                    const bloqueDeEstiloFinal = `<style>\n${cssModificado}\n</style>`;
+                    const linkRegex = /<link[^>]+href="(?:.\/)?estilos\.css"[^>]*>/i;
+
+                    if (nuevoHtml.match(linkRegex)) {
+                        nuevoHtml = nuevoHtml.replace(linkRegex, bloqueDeEstiloFinal);
+                    } else {
+                        nuevoHtml = nuevoHtml.replace(/(<\/head>)/i, `${bloqueDeEstiloFinal}\n$1`);
+                    }
+
+                    nuevoHtml = nuevoHtml.replace(/<body([^>]*)>/i, `<body$1>\n<div class='contenedor'>`);
+                    nuevoHtml = nuevoHtml.replace(/<\/body>/i, `</div>\n</body>`);
+                    
+                    const regexNotasAlPie = /(href=")[^#"]*(#[^"]*")/g;
+                    nuevoHtml = nuevoHtml.replace(regexNotasAlPie, '$1$2');
+                    
+                    nuevoHtml = nuevoHtml.replace(/ParaOverride-[2,1]/g, '');
+
+                    // Guardar el resultado para la descarga
+                    archivoProcesado = nuevoHtml;
+                    nombreArchivoProcesado = `r_${htmlFile.name}`;
+                    tipoMimeProcesado = 'text/html';
+
+                    // Actualizar la interfaz de usuario
+                    botonProcesar.disabled = false;
+                    botonProcesar.textContent = 'Procesar y convertir';
+                    botonDescargar.classList.remove('hidden');
+                    botonReiniciar.classList.remove('hidden');
+                    botonSubirHtml.disabled = false;
+                    botonSubirCss.disabled = false;
+
+                } catch (error) {
+                    console.error("Error al procesar los archivos:", error);
+                    alert("Hubo un error al procesar los archivos. Detalles: " + error.message);
                     botonProcesar.disabled = false;
                     botonProcesar.textContent = 'Procesar y convertir';
                     botonSubirHtml.disabled = false;
                     botonSubirCss.disabled = false;
-                });
+                }
+            })
+            .catch(error => {
+                console.error("Error al leer los archivos:", error);
+                alert("Hubo un error al leer los archivos. Detalles: " + error.message);
+                botonProcesar.disabled = false;
+                botonProcesar.textContent = 'Procesar y convertir';
+                botonSubirHtml.disabled = false;
+                botonSubirCss.disabled = false;
+            });
+    }
+
+    // Función para descargar el archivo
+    function descargarArchivo() {
+        if (archivoProcesado) {
+            const blob = new Blob([archivoProcesado], {
+                type: tipoMimeProcesado
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombreArchivoProcesado;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } else {
+            alert("Primero debes subir y procesar un archivo.");
         }
+    }
 
-        // Función para descargar el archivo
-        function descargarArchivo() {
-            if (archivoProcesado) {
-                const blob = new Blob([archivoProcesado], { type: tipoMimeProcesado });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = nombreArchivoProcesado;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            } else {
-                console.log("Primero debes subir y procesar un archivo.");
-            }
+    // Función para reiniciar el estado de la aplicación
+    function reiniciarAplicacion() {
+        htmlFile = null;
+        cssFile = null;
+        archivoProcesado = null;
+        nombreArchivoProcesado = null;
+        tipoMimeProcesado = null;
+        inputHtml.value = '';
+        inputCss.value = '';
+        actualizarEstadoUI();
+        botonDescargar.classList.add('hidden');
+    }
+
+    // Lógica de escucha de eventos
+    botonSubirHtml.addEventListener('click', () => {
+        inputHtml.click();
+    });
+
+    botonSubirCss.addEventListener('click', () => {
+        inputCss.click();
+    });
+
+    inputHtml.addEventListener('change', (event) => {
+        htmlFile = event.target.files[0];
+        actualizarEstadoUI();
+    });
+
+    inputCss.addEventListener('change', (event) => {
+        cssFile = event.target.files[0];
+        actualizarEstadoUI();
+    });
+
+    botonProcesar.addEventListener('click', () => {
+        if (htmlFile && cssFile) {
+            procesarArchivos(htmlFile, cssFile);
+        } else {
+            alert("Faltan archivos por subir.");
         }
+    });
 
-        // Función para reiniciar el estado de la aplicación
-        function reiniciarAplicacion() {
-            htmlFile = null;
-            cssFile = null;
-            archivoProcesado = null;
-            nombreArchivoProcesado = null;
-            tipoMimeProcesado = null;
-            inputHtml.value = '';
-            inputCss.value = '';
-            actualizarEstadoUI();
-            botonDescargar.classList.add('hidden');
-        }
+    botonDescargar.addEventListener('click', descargarArchivo);
+    botonReiniciar.addEventListener('click', reiniciarAplicacion);
 
-        // Lógica de escucha de eventos
-        botonSubirHtml.addEventListener('click', () => {
-            inputHtml.click();
-        });
-        
-        botonSubirCss.addEventListener('click', () => {
-            inputCss.click();
-        });
 
-        inputHtml.addEventListener('change', (event) => {
-            htmlFile = event.target.files[0];
-            actualizarEstadoUI();
-        });
-
-        inputCss.addEventListener('change', (event) => {
-            cssFile = event.target.files[0];
-            actualizarEstadoUI();
-        });
-        
-        botonProcesar.addEventListener('click', () => {
-            if (htmlFile && cssFile) {
-                procesarArchivos(htmlFile, cssFile);
-            } else {
-                console.log("Faltan archivos por subir.");
-            }
-        });
-
-        botonDescargar.addEventListener('click', descargarArchivo);
-        botonReiniciar.addEventListener('click', reiniciarAplicacion);
     </script>
 
 </body>
