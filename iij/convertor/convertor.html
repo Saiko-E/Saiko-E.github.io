@@ -170,7 +170,12 @@
                     let ubicacionTexto;
                     if (revista.includes('problema')) {
                         const ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
-                        const valorEncontrado = ubicacionOrcidMatch ? .[2];
+                        
+                        // --- INICIO DE LA CORRECCIÓN ---
+                        // Antes: const valorEncontrado = ubicacionOrcidMatch ? .[2];
+                        const valorEncontrado = ubicacionOrcidMatch ? ubicacionOrcidMatch[2] : null;
+                        // --- FIN DE LA CORRECCIÓN ---
+
                         ubicacionTexto = (!valorEncontrado || valorEncontrado === '-') ? 'flex-end' : valorEncontrado;
                     } else if (revistaCompleta.includes('Revista Mexicana de Derecho Constitucional') || revistaCompleta.includes('Estudios en derecho a la información')) {
                         ubicacionTexto = `center`;
@@ -395,6 +400,13 @@ th, td {
         inputCss.value = '';
         actualizarEstadoUI();
         botonDescargar.classList.add('hidden');
+        
+        // --- MEJORA DE ROBUSTEZ ---
+        // Asegura que los botones se reactiven al reiniciar
+        botonSubirHtml.disabled = false;
+        botonSubirCss.disabled = false;
+        botonProcesar.textContent = 'Procesar y convertir';
+        // --------------------------
     }
 
     // Lógica de escucha de eventos
@@ -426,8 +438,6 @@ th, td {
 
     botonDescargar.addEventListener('click', descargarArchivo);
     botonReiniciar.addEventListener('click', reiniciarAplicacion);
-
-
     </script>
 
 </body>
