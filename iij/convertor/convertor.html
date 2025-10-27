@@ -186,7 +186,7 @@
                     let nuevoHtml = htmlContenido;
                     nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g, '$1');
                     nuevoHtml = nuevoHtml.replace(/&#160;/g, ' ');
-
+                    nuevoHtml = nuevoHtml.replace(/<meta chatset="utf-8" \/>/g,'/<meta charset="utf-8" \/>\n <meta name="viewport" content="width=device-width, initial-scale=1.0" \/>\n /');
                     // --- INICIO: NUEVA LÓGICA PARA EXTRAER ESTILOS DEL DOI ---
                     let doiFontFamily = 'inherit'; // Valor por defecto
                     let doiFontSize = '1em'; // Valor por defecto
@@ -258,15 +258,13 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
     height: 1em;
 }
 .ORCID2 svg {
-    width: 80%;
-    height: 80%;
+    width: 100%;
+    height: 100%;
     display: block;
 }
 .ORCID2 a {
-    text-decoration: none;
-    color: inherit;
-    font-family: ${doiFontFamily}; /* Aplicado desde la clase del DOI */
-    font-size: ${doiFontSize};   /* Aplicado desde la clase del DOI */
+    font-family: ${doiFontFamily}; 
+    font-size: ${doiFontSize};   
 }`;
 
                     const svgContent = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 256 256" xml:space="preserve"> <style type="text/css"> .st0{fill:#A6CE39;} .st1{fill:#FFFFFF;} </style> <circle class="st0" cx="128" cy="128" r="128"/> <g> <path class="st1" d="M86.3,186.2H70.9V79.1h15.4v48.4V186.2z"/> <path class="st1" d="M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z M124.3,172.4h24.5c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z"/> <path class="st1" d="M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1 c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z"/> </g> </svg>`;
@@ -310,7 +308,23 @@ th, td {
     border: 1px solid #ccc;
     padding: 0.5em;
     text-align: left;
-}`;
+}
+ 
+@media (max-width: 768px){
+   .contenedor{ padding: 1em;}
+   body{font-size: 1em;}
+   p.ESTILOS-FINALES_SUMARIO{
+     margin-left: 1em;
+     margin-right: 1em;
+   }
+
+   p.ESTILOS-FINALES_BODY-EXT{
+      text-ident: 1.0em;
+   }
+}
+
+
+`;
                     const bloqueCSS = `\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n${clasesVector}\n${estilosDatosAutor}\n${cssContenido}\n${estilosParaTablas}\n`;
 
                     function pxToEm(match, pxValue) {
@@ -332,6 +346,7 @@ th, td {
 
                     nuevoHtml = nuevoHtml.replace(/<body([^>]*)>/i, `<body$1>\n<div class='contenedor'>`);
                     nuevoHtml = nuevoHtml.replace(/<\/body>/i, `</div>\n</body>`);
+                    nuevoHtml = nuevoHtml.replace(/<br \/>/i, ' ');
                     
                     const regexNotasAlPie = /(href=")[^#"]*(#[^"]*")/g;
                     nuevoHtml = nuevoHtml.replace(regexNotasAlPie, '$1$2');
