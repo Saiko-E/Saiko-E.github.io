@@ -246,9 +246,78 @@ p:has(+ p.ESTILOS-FINALES_DOI) {
 }`;
                     
                     const clasesVector = `
+ img {
+
+    max-width: 100%;
+
+    height: auto;
+
+    display: block;
+
+    margin-left: auto;
+
+    margin-right: auto;
+
+    float: center;
+
+}
+
+img + p {
+
+    text-align: center;
+
+    margin-top: 0.5em;
+
+    margin-bottom: 0.5em;
+
+}
+
+p.REV-DER-SOCIAL_PP:has(+ p.REV-DER-SOCIAL_PP img) {
+
+  text-align: center;
+
+  margin-top: 0.5em;
+
+  margin-bottom: 0.5em;
+
+}
+
+p.REV-DER-SOCIAL_PP:has(img) + p.REV-DER-SOCIAL_PP {
+
+  margin-top: 0.5em;
+
+  margin-bottom: .5em;
+
+}
+
+p.REV-DER-SOCIAL_PP:has(+ table) {
+
+  text-align: center;
+
+  margin-top: 0.5em;
+
+  margin-bottom: 0.5em;
+
+}
+
+table + p.REV-DER-SOCIAL_PP {
+
+  margin-top: 1.5em;
+
+  margin-bottom: 1.5em;
+
+}table + p.REV-DER-SOCIAL_PP {
+
+  margin-top: 1.5em;
+
+  margin-bottom: 1.5em;
+
+}
+
+
 .ORCID2 {
     display: flex;
-    justify-content: ${ubicacionTexto};
+    justify-content: center;
     align-items: center;
     gap: 0.5em; 
 }
