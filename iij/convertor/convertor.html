@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convertidor de Documentos</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -20,52 +21,85 @@
             padding: 2.5rem;
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
             max-width: 500px;
             width: 100%;
         }
         .hidden {
             display: none;
         }
+        .tab-link {
+            @apply px-4 py-2 font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300;
+        }
+        .tab-link.active {
+            @apply text-indigo-600 border-indigo-500;
+        }
     </style>
 </head>
 <body>
 
     <div class="container space-y-6">
-        <h1 class="text-3xl font-bold text-gray-800">Convierte tus documentos</h1>
-        <p class="text-gray-600">Sube tu archivo HTML y CSS.</p>
+        <h1 class="text-3xl font-bold text-gray-800 text-center">Convierte tus documentos</h1>
+        
+        <div class="mb-4 border-b border-gray-200">
+            <nav class="flex -mb-px space-x-4" aria-label="Tabs">
+                <a href="#" id="tab-unico" class="tab-link active">
+                    Archivo Único
+                </a>
+                <a href="#" id="tab-carpeta" class="tab-link">
+                    Carpeta Completa
+                </a>
+            </nav>
+        </div>
 
-        <!-- Contenedor para el estado de los archivos -->
-        <div id="estado-archivos" class="flex flex-col items-start w-full p-4 border rounded-lg bg-gray-50 border-gray-200 text-left">
-            <div id="estado-html" class="flex items-center space-x-2 text-red-500 font-semibold">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                </svg>
-                <span>Archivo HTML: No subido</span>
+        <div id="modo-unico" class="space-y-6">
+            <p class="text-gray-600 text-center">Sube tu archivo HTML y CSS.</p>
+            <div id="estado-archivos" class="flex flex-col items-start w-full p-4 border rounded-lg bg-gray-50 border-gray-200 text-left">
+                <div id="estado-html" class="flex items-center space-x-2 text-red-500 font-semibold">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
+                    <span>Archivo HTML: No subido</span>
+                </div>
+                <div id="estado-css" class="flex items-center space-x-2 text-red-500 font-semibold mt-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
+                    <span>Archivo CSS: No subido</span>
+                </div>
             </div>
-            <div id="estado-css" class="flex items-center space-x-2 text-red-500 font-semibold mt-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                </svg>
-                <span>Archivo CSS: No subido</span>
+
+            <input type="file" id="input-html" class="hidden" accept=".html">
+            <input type="file" id="input-css" class="hidden" accept=".css">
+            
+            <div class="space-y-4">
+                <button id="boton-subir-html" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+                    Subir archivo HTML
+                </button>
+                <button id="boton-subir-css" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+                    Subir archivo CSS
+                </button>
+                <button id="boton-procesar" class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors" disabled>
+                    Procesar y convertir
+                </button>
             </div>
         </div>
 
-        <!-- Inputs de archivo ocultos -->
-        <input type="file" id="input-html" class="hidden" accept=".html">
-        <input type="file" id="input-css" class="hidden" accept=".css">
-        
-        <!-- Botones de acción -->
+        <div id="modo-carpeta" class="hidden space-y-6">
+            <p class="text-gray-600 text-center">Sube la carpeta completa con tus pares de archivos (ej: 123.html y 123-xxx.css).</p>
+            
+            <div id="estado-carpeta" class="flex items-center justify-center space-x-2 w-full p-4 border rounded-lg bg-gray-50 border-gray-200 text-center font-semibold text-gray-500">
+                <span>Carpeta no seleccionada</span>
+            </div>
+
+            <input type="file" id="input-carpeta" class="hidden" webkitdirectory directory multiple>
+
+            <div class="space-y-4">
+                <button id="boton-subir-carpeta" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+                    Seleccionar Carpeta
+                </button>
+                <button id="boton-procesar-carpeta" class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors" disabled>
+                    Procesar y Descargar ZIP
+                </button>
+            </div>
+        </div>
+
         <div class="space-y-4">
-            <button id="boton-subir-html" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
-                Subir archivo HTML
-            </button>
-            <button id="boton-subir-css" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
-                Subir archivo CSS
-            </button>
-            <button id="boton-procesar" class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors" disabled>
-                Procesar y convertir
-            </button>
             <button id="boton-descargar" class="w-full px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition-colors hidden">
                 Descargar resultado
             </button>
@@ -73,12 +107,14 @@
                 Reiniciar
             </button>
         </div>
+
     </div>
 
     <script>
     // Variables de estado
     let htmlFile = null;
     let cssFile = null;
+    let folderFiles = [];
     let archivoProcesado = null;
     let nombreArchivoProcesado = null;
     let tipoMimeProcesado = null;
@@ -86,16 +122,43 @@
     // Elementos del DOM
     const inputHtml = document.getElementById('input-html');
     const inputCss = document.getElementById('input-css');
+    const inputCarpeta = document.getElementById('input-carpeta');
     const botonSubirHtml = document.getElementById('boton-subir-html');
     const botonSubirCss = document.getElementById('boton-subir-css');
+    const botonSubirCarpeta = document.getElementById('boton-subir-carpeta');
     const botonProcesar = document.getElementById('boton-procesar');
+    const botonProcesarCarpeta = document.getElementById('boton-procesar-carpeta');
     const botonDescargar = document.getElementById('boton-descargar');
     const botonReiniciar = document.getElementById('boton-reiniciar');
     const estadoHtml = document.getElementById('estado-html');
     const estadoCss = document.getElementById('estado-css');
+    const estadoCarpeta = document.getElementById('estado-carpeta');
+    const tabUnico = document.getElementById('tab-unico');
+    const tabCarpeta = document.getElementById('tab-carpeta');
+    const modoUnico = document.getElementById('modo-unico');
+    const modoCarpeta = document.getElementById('modo-carpeta');
 
+    // --- LÓGICA DE PESTAÑAS ---
+    tabUnico.addEventListener('click', (e) => {
+        e.preventDefault();
+        tabUnico.classList.add('active');
+        tabCarpeta.classList.remove('active');
+        modoUnico.classList.remove('hidden');
+        modoCarpeta.classList.add('hidden');
+        reiniciarAplicacion(); 
+    });
+
+    tabCarpeta.addEventListener('click', (e) => {
+        e.preventDefault();
+        tabUnico.classList.remove('active');
+        tabCarpeta.classList.add('active');
+        modoUnico.classList.add('hidden');
+        modoCarpeta.classList.remove('hidden');
+        reiniciarAplicacion(); 
+    });
+
+    // --- LÓGICA MODO ARCHIVO ÚNICO ---
     function actualizarEstadoUI() {
-        // Actualiza el estado visual de los archivos subidos
         if (htmlFile) {
             estadoHtml.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Archivo HTML: ${htmlFile.name}</span>`;
             estadoHtml.classList.remove('text-red-500');
@@ -116,380 +179,17 @@
             estadoCss.classList.remove('text-green-500');
         }
 
-        // Habilita el botón de procesar si ambos archivos están subidos
         botonProcesar.disabled = !(htmlFile && cssFile);
 
-        // Muestra el botón de reiniciar si al menos un archivo está subido
         if (htmlFile || cssFile) {
             botonReiniciar.classList.remove('hidden');
-        } else {
+        } else if (folderFiles.length === 0) {
             botonReiniciar.classList.add('hidden');
         }
     }
 
-    // Función para procesar los archivos
-    function procesarArchivos(htmlFile, cssFile) {
-        botonProcesar.disabled = true;
-        botonProcesar.textContent = 'Procesando...';
-        botonDescargar.classList.add('hidden');
-        botonSubirHtml.disabled = true;
-        botonSubirCss.disabled = true;
-
-        const leerHTML = new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = (e) => reject(e);
-            reader.readAsText(htmlFile);
-        });
-
-        const leerCSS = new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = (e) => reject(e);
-            reader.readAsText(cssFile);
-        });
-
-        Promise.all([leerHTML, leerCSS])
-            .then(([htmlContenido, cssContenido]) => {
-                try {
-                    // --- Lógica de conversión ---
-                    cssContenido = cssContenido.replace(/(ORCID)|(orcid)/gi, 'ORCID2');
-
-                    const tipoRevistaMatch = htmlContenido.match(/class="como_citar">.*?class="cursivas">\s*([^<\s]+)/s);
-                    const revista = tipoRevistaMatch ? tipoRevistaMatch[1].toLowerCase() : '';
-
-                    const revistaCompletaMatch = htmlContenido.match(/class="como_citar">\s*<p class="cursivas">\s*([^<]+)/s);
-                    let revistaCompleta = revistaCompletaMatch ? revistaCompletaMatch[1].trim() : '';
-                    if (revistaCompletaMatch) {
-                        revistaCompleta = revistaCompletaMatch[1].replace(/<[^>]*>/g, '').trim();
-                    }
-
-                    console.log(`Revista corta: '${revista}'`);
-                    console.log(`Revista completa: '${revistaCompleta}'`);
-
-                    let ubicacionTexto;
-                    if (revista.includes('problema')) {
-                        const ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
-                        
-                        // --- INICIO DE LA CORRECCIÓN ---
-                        // Antes: const valorEncontrado = ubicacionOrcidMatch ? .[2];
-                        const valorEncontrado = ubicacionOrcidMatch ? ubicacionOrcidMatch[2] : null;
-                        // --- FIN DE LA CORRECCIÓN ---
-
-                        ubicacionTexto = (!valorEncontrado || valorEncontrado === '-') ? 'flex-end' : valorEncontrado;
-                    } else if (revistaCompleta.includes('Revista Mexicana de Derecho Constitucional') || revistaCompleta.includes('Estudios en derecho a la información')) {
-                        ubicacionTexto = `center`;
-                    } else {
-                        ubicacionTexto = `flex-end`;
-                    }
-
-                    let nuevoHtml = htmlContenido;
-                    nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g, '$1');
-                    nuevoHtml = nuevoHtml.replace(/&#160;/g, ' ');
-                    nuevoHtml = nuevoHtml.replace(/<meta chatset="utf-8" \/>/g,'/<meta charset="utf-8" \/>\n <meta name="viewport" content="width=device-width, initial-scale=1.0" \/>\n /');
-                    // --- INICIO: NUEVA LÓGICA PARA EXTRAER ESTILOS DEL DOI ---
-                    let doiFontFamily = 'inherit'; // Valor por defecto
-                    let doiFontSize = '1em'; // Valor por defecto
-
-                    const doiClassMatch = htmlContenido.match(/<p\s+class="([^"]+)"[^>]*>.*?https?:\/\/doi\.org.*?</s);
-                    if (doiClassMatch && doiClassMatch[1]) {
-                        // Obtenemos la primera clase de la lista
-                        const doiClassName = doiClassMatch[1].trim().split(' ')[0];
-                        console.log(`Clase del DOI encontrada: .${doiClassName}`);
-                        
-                        // Escapamos el nombre de la clase para usarlo en la expresión regular
-                        const escapedDoiClassName = doiClassName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-                        const cssRuleRegex = new RegExp(`\\.${escapedDoiClassName}[^\\{]*\\{([^\\}]+)\\}`, 'i');
-                        const cssRuleMatch = cssContenido.match(cssRuleRegex);
-
-                        if (cssRuleMatch && cssRuleMatch[1]) {
-                            const ruleContent = cssRuleMatch[1];
-                            console.log(`Regla CSS encontrada para el DOI: ${ruleContent}`);
-
-                            const fontFamilyMatch = ruleContent.match(/font-family:\s*([^;]+)/i);
-                            if (fontFamilyMatch && fontFamilyMatch[1]) {
-                                doiFontFamily = fontFamilyMatch[1].trim();
-                                console.log(`Font-family del DOI extraído: ${doiFontFamily}`);
-                            }
-
-                            const fontSizeMatch = ruleContent.match(/font-size:\s*([^;]+)/i);
-                            if (fontSizeMatch && fontSizeMatch[1]) {
-                                doiFontSize = fontSizeMatch[1].trim();
-                                console.log(`Font-size del DOI extraído: ${doiFontSize}`);
-                            }
-                        } else {
-                            console.log(`Advertencia: No se encontró una regla CSS para la clase .${doiClassName}`);
-                        }
-                    } else {
-                        console.log("Advertencia: No se encontró el párrafo con el DOI para extraer su clase.");
-                    }
-                    // --- FIN: NUEVA LÓGICA PARA EXTRAER ESTILOS DEL DOI ---
-                    
-                    const estilosDatosAutor = `
-/* Estilos para agrupar datos de autor sin márgenes internos */
-.ORCID2 {
-    margin-bottom: 0.2em !important; /* Reduce espacio después del ORCID */
-    margin-top: 1.5em !important;    /* Asegura espacio entre diferentes autores (orcid a orcid) */
-}
-
-/* Anula los márgenes de los párrafos de afiliación/email que siguen al ORCID */
-.ORCID2 + p,
-.ORCID2 + p + p {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    line-height: 1.4; /* Mejora la legibilidad al estar juntos */
-}
-
-/* Identifica el último párrafo de datos de autor antes del DOI */
-p:has(+ p.ESTILOS-FINALES_DOI) {
-    margin-bottom: 2em !important; /* Añade espacio entre los datos y el DOI */
-}`;
-                    
-                    const clasesVector = `
- img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    float: center;
-}
-
-img + p {
-    text-align: center;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-}
-
-p.REV-DER-SOCIAL_PP:has(+ p.REV-DER-SOCIAL_PP img) {
-
-  text-align: center;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
-p.REV-DER-SOCIAL_Body-text:has(+ p.REV-DER-SOCIAL_Body-text img) {
-
-  text-align: center;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
-p.REV-DER-SOCIAL_PP:has(img) + p.REV-DER-SOCIAL_PP {
-  margin-top: 0.5em;
-  margin-bottom: .5em;
-}
-p.REV-DER-SOCIAL_Body-text:has(img) + p.REV-DER-SOCIAL_Body-text {
-  margin-top: 0.5em;
-  margin-bottom: .5em;
-}
-
-p.REV-DER-SOCIAL_PP:has(+ table) {
-  text-align: center;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
-p.REV-DER-SOCIAL_Body-text:has(+ table) {
-  text-align: center;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
-
-table + p.REV-DER-SOCIAL_PP {
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
-}
-
-table + p.REV-DER-SOCIAL_Body-text {
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
-}
-
-
-.ORCID2 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5em; 
-}
-.ORCID2 ._idSVGInline {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-}
-.ORCID2 svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
-.ORCID2 a {
-    font-family: ${doiFontFamily}; 
-    font-size: ${doiFontSize};   
-}`;
-
-                    const svgContent = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 256 256" xml:space="preserve"> <style type="text/css"> .st0{fill:#A6CE39;} .st1{fill:#FFFFFF;} </style> <circle class="st0" cx="128" cy="128" r="128"/> <g> <path class="st1" d="M86.3,186.2H70.9V79.1h15.4v48.4V186.2z"/> <path class="st1" d="M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z M124.3,172.4h24.5c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z"/> <path class="st1" d="M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1 c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z"/> </g> </svg>`;
-
-                    let orcidReemplazados = 0;
-                    const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|REV-DER-SOCIAL_orcid|REV-DER-SOCIAL_doi|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-[0-9X]{4})(?:(?!<\/p>).)*?<\/p>/sig;
-                    
-                    nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
-                        orcidReemplazados++;
-                        const groups = args.pop();
-                        const linkCapturado = groups.link.trim();
-                        console.log(`ORCID Encontrado #${orcidReemplazados}: ${linkCapturado}`);
-                        
-                        return `
-<p class="ORCID2">
-    <span class="_idSVGInline">${svgContent}</span>
-    <a href="${linkCapturado}">
-        <span class="Hiperv-nculo">${linkCapturado}</span>
-    </a>
-</p>`.trim();
-                    });
-
-                    if (orcidReemplazados === 0) {
-                        console.log("ADVERTENCIA: La expresión regular para ORCID no encontró ninguna coincidencia en el HTML.");
-                    }
-
-                    const estilosParaTablas = `
-/* Estilos para que las tablas ocupen todo el ancho */
-table {
-    width: auto;
-    max-width: 100%;
-    border-collapse: collapse;
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-    margin-left: auto;
-    margin-right: auto;
-}
-th, td {
-    border: 1px solid #ccc;
-    padding: 0.5em;
-    text-align: left;
-}
- 
-@media (max-width: 768px){
-   .contenedor{ padding: 1em;}
-   body{font-size: 1em;}
-   p.ESTILOS-FINALES_SUMARIO{
-     margin-left: 1em;
-     margin-right: 1em;
-   }
-
-   p.ESTILOS-FINALES_BODY-EXT{
-      text-ident: 1.0em;
-   }
-}
-
-
-`;
-                    const bloqueCSS = `\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n${clasesVector}\n${estilosDatosAutor}\n${cssContenido}\n${estilosParaTablas}\n`;
-
-                    function pxToEm(match, pxValue) {
-                        const emValue = parseInt(pxValue) / 9;
-                        return `${emValue.toFixed(1)}em;`;
-                    }
-                    
-                    // --- CAMBIO: SE ELIMINA LA FUNCIÓN Y LA LLAMADA A aumentarMargen ---
-                    const cssModificado = bloqueCSS.replace(/\s*(\d+)px;/g, pxToEm);
-
-                    const bloqueDeEstiloFinal = `<style>\n${cssModificado}\n</style>`;
-                    const linkRegex = /<link[^>]+href="(?:.\/)?estilos\.css"[^>]*>/i;
-
-                    if (nuevoHtml.match(linkRegex)) {
-                        nuevoHtml = nuevoHtml.replace(linkRegex, bloqueDeEstiloFinal);
-                    } else {
-                        nuevoHtml = nuevoHtml.replace(/(<\/head>)/i, `${bloqueDeEstiloFinal}\n$1`);
-                    }
-
-                    nuevoHtml = nuevoHtml.replace(/<body([^>]*)>/i, `<body$1>\n<div class='contenedor'>`);
-                    nuevoHtml = nuevoHtml.replace(/<\/body>/i, `</div>\n</body>`);
-                    nuevoHtml = nuevoHtml.replace(/<br \/>/i, ' ');
-                    
-                    const regexNotasAlPie = /(href=")[^#"]*(#[^"]*")/g;
-                    nuevoHtml = nuevoHtml.replace(regexNotasAlPie, '$1$2');
-                    
-                    nuevoHtml = nuevoHtml.replace(/ParaOverride-[2,1]/g, '');
-
-                    // Guardar el resultado para la descarga
-                    archivoProcesado = nuevoHtml;
-                    nombreArchivoProcesado = `r_${htmlFile.name}`;
-                    tipoMimeProcesado = 'text/html';
-
-                    // Actualizar la interfaz de usuario
-                    botonProcesar.disabled = false;
-                    botonProcesar.textContent = 'Procesar y convertir';
-                    botonDescargar.classList.remove('hidden');
-                    botonReiniciar.classList.remove('hidden');
-                    botonSubirHtml.disabled = false;
-                    botonSubirCss.disabled = false;
-
-                } catch (error) {
-                    console.error("Error al procesar los archivos:", error);
-                    alert("Hubo un error al procesar los archivos. Detalles: " + error.message);
-                    botonProcesar.disabled = false;
-                    botonProcesar.textContent = 'Procesar y convertir';
-                    botonSubirHtml.disabled = false;
-                    botonSubirCss.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error("Error al leer los archivos:", error);
-                alert("Hubo un error al leer los archivos. Detalles: " + error.message);
-                botonProcesar.disabled = false;
-                botonProcesar.textContent = 'Procesar y convertir';
-                botonSubirHtml.disabled = false;
-                botonSubirCss.disabled = false;
-            });
-    }
-
-    // Función para descargar el archivo
-    function descargarArchivo() {
-        if (archivoProcesado) {
-            const blob = new Blob([archivoProcesado], {
-                type: tipoMimeProcesado
-            });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = nombreArchivoProcesado;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        } else {
-            alert("Primero debes subir y procesar un archivo.");
-        }
-    }
-
-    // Función para reiniciar el estado de la aplicación
-    function reiniciarAplicacion() {
-        htmlFile = null;
-        cssFile = null;
-        archivoProcesado = null;
-        nombreArchivoProcesado = null;
-        tipoMimeProcesado = null;
-        inputHtml.value = '';
-        inputCss.value = '';
-        actualizarEstadoUI();
-        botonDescargar.classList.add('hidden');
-        
-        // --- MEJORA DE ROBUSTEZ ---
-        // Asegura que los botones se reactiven al reiniciar
-        botonSubirHtml.disabled = false;
-        botonSubirCss.disabled = false;
-        botonProcesar.textContent = 'Procesar y convertir';
-        // --------------------------
-    }
-
-    // Lógica de escucha de eventos
-    botonSubirHtml.addEventListener('click', () => {
-        inputHtml.click();
-    });
-
-    botonSubirCss.addEventListener('click', () => {
-        inputCss.click();
-    });
+    botonSubirHtml.addEventListener('click', () => inputHtml.click());
+    botonSubirCss.addEventListener('click', () => inputCss.click());
 
     inputHtml.addEventListener('change', (event) => {
         htmlFile = event.target.files[0];
@@ -503,11 +203,329 @@ th, td {
 
     botonProcesar.addEventListener('click', () => {
         if (htmlFile && cssFile) {
-            procesarArchivos(htmlFile, cssFile);
+            botonProcesar.disabled = true;
+            botonProcesar.textContent = 'Procesando...';
+            botonSubirHtml.disabled = true;
+            botonSubirCss.disabled = true;
+            botonReiniciar.disabled = true;
+
+            generarHtmlProcesado(htmlFile, cssFile)
+                .then(resultado => {
+                    archivoProcesado = resultado.contenido;
+                    nombreArchivoProcesado = resultado.nombre;
+                    tipoMimeProcesado = 'text/html';
+                    botonProcesar.textContent = 'Procesar y convertir';
+                    botonDescargar.classList.remove('hidden');
+                    botonSubirHtml.disabled = false;
+                    botonSubirCss.disabled = false;
+                    botonReiniciar.disabled = false;
+                })
+                .catch(error => {
+                    console.error("Error al procesar el archivo:", error);
+                    alert("Hubo un error al procesar el archivo: " + error.message);
+                    botonProcesar.disabled = false;
+                    botonProcesar.textContent = 'Procesar y convertir';
+                    botonSubirHtml.disabled = false;
+                    botonSubirCss.disabled = false;
+                    botonReiniciar.disabled = false;
+                });
+
         } else {
             alert("Faltan archivos por subir.");
         }
     });
+
+    // --- LÓGICA MODO CARPETA ---
+
+    botonSubirCarpeta.addEventListener('click', () => inputCarpeta.click());
+
+    // --- CORRECCIÓN 1: AQUÍ ---
+    inputCarpeta.addEventListener('change', (event) => {
+        folderFiles = Array.from(event.target.files);
+        if (folderFiles.length > 0) {
+            
+            // Un archivo está en la raíz si su ruta (ej: "Carpeta/archivo.txt") tiene 2 partes
+            const topLevelFiles = folderFiles.filter(file => file.webkitRelativePath.split('/').length === 2);
+            
+            estadoCarpeta.textContent = `${topLevelFiles.length} archivos encontrados en el directorio principal.`;
+            estadoCarpeta.classList.remove('text-gray-500');
+            estadoCarpeta.classList.add('text-green-500');
+            botonProcesarCarpeta.disabled = false;
+            botonReiniciar.classList.remove('hidden');
+        } else {
+            estadoCarpeta.textContent = 'Carpeta no seleccionada';
+            estadoCarpeta.classList.add('text-gray-500');
+            estadoCarpeta.classList.remove('text-green-500');
+            botonProcesarCarpeta.disabled = true;
+        }
+    });
+
+    // --- CORRECCIÓN 2: AQUÍ ---
+    botonProcesarCarpeta.addEventListener('click', async () => {
+        if (folderFiles.length === 0) {
+            alert("Por favor, selecciona una carpeta primero.");
+            return;
+        }
+
+        botonProcesarCarpeta.disabled = true;
+        botonProcesarCarpeta.textContent = 'Procesando... (0%)';
+        botonSubirCarpeta.disabled = true;
+        botonReiniciar.disabled = true;
+
+        const zip = new JSZip();
+        
+        // 1. Filtrar para procesar solo archivos del directorio raíz (ignorar subcarpetas)
+        // Un archivo está en la raíz si su ruta (ej: "Carpeta/archivo.txt") tiene 2 partes
+        const topLevelFiles = folderFiles.filter(file => file.webkitRelativePath.split('/').length === 2);
+        
+        // 2. Separar archivos raíz por tipo
+        const htmlFiles = topLevelFiles.filter(file => file.name.toLowerCase().endsWith('.html'));
+        const cssFiles = topLevelFiles.filter(file => file.name.toLowerCase().endsWith('.css'));
+
+        const pairs = [];
+        console.log(`Archivos HTML encontrados: ${htmlFiles.length}`);
+        console.log(`Archivos CSS encontrados: ${cssFiles.length}`);
+
+        // 3. Emparejamiento flexible:
+        for (const htmlFile of htmlFiles) {
+            const baseName = htmlFile.name.replace(/\.html$/i, '');
+            const matchingCssFile = cssFiles.find(cssFile => 
+                cssFile.name.toLowerCase().startsWith(baseName.toLowerCase())
+            );
+            
+            if (matchingCssFile) {
+                pairs.push({ htmlFile: htmlFile, cssFile: matchingCssFile });
+                console.log(`Par encontrado: ${htmlFile.name} -> ${matchingCssFile.name}`);
+            } else {
+                console.warn(`ADVERTENCIA: No se encontró CSS para ${htmlFile.name}`);
+            }
+        }
+
+        // 4. Continuar con el procesamiento
+        if (pairs.length === 0) {
+            alert("No se encontraron pares de archivos .html y .css que coincidan en el directorio principal.");
+            reiniciarAplicacion(); 
+            return;
+        }
+        
+        estadoCarpeta.textContent = `Se encontraron ${pairs.length} pares. Procesando...`;
+
+        let procesados = 0;
+        const promesas = [];
+
+        for (const pair of pairs) {
+            const promesa = generarHtmlProcesado(pair.htmlFile, pair.cssFile)
+                .then(resultado => {
+                    zip.file(resultado.nombre, resultado.contenido);
+                    procesados++;
+                    botonProcesarCarpeta.textContent = `Procesando... (${Math.round((procesados / pairs.length) * 100)}%)`;
+                });
+            promesas.push(promesa);
+        }
+
+        try {
+            await Promise.all(promesas);
+
+            estadoCarpeta.textContent = `¡${procesados} pares procesados! Generando ZIP...`;
+            botonProcesarCarpeta.textContent = 'Generando ZIP...';
+
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+            
+            descargarBlob(zipBlob, 'Resultados.zip');
+            
+            estadoCarpeta.textContent = `¡ZIP descargado!`;
+            botonReiniciar.disabled = false;
+            botonSubirCarpeta.disabled = false;
+            botonProcesarCarpeta.textContent = 'Procesar y Descargar ZIP';
+
+        } catch (error) {
+            console.error("Error al procesar la carpeta:", error);
+            alert("Hubo un error al procesar uno o más archivos: " + error.message);
+            reiniciarAplicacion();
+        }
+    });
+
+
+    // --- FUNCIONES CENTRALIZADAS (SIN CAMBIOS) ---
+    function generarHtmlProcesado(htmlFile, cssFile) {
+        return new Promise((resolve, reject) => {
+            const leerHTML = new Promise((res, rej) => {
+                const reader = new FileReader();
+                reader.onload = (e) => res(e.target.result);
+                reader.onerror = (e) => rej(e);
+                reader.readAsText(htmlFile);
+            });
+
+            const leerCSS = new Promise((res, rej) => {
+                const reader = new FileReader();
+                reader.onload = (e) => res(e.target.result);
+                reader.onerror = (e) => rej(e);
+                reader.readAsText(cssFile);
+            });
+
+            Promise.all([leerHTML, leerCSS])
+                .then(([htmlContenido, cssContenido]) => {
+                    try {
+                        // --- INICIO DE TU LÓGICA DE CONVERSIÓN ---
+                        cssContenido = cssContenido.replace(/(ORCID)|(orcid)/gi, 'ORCID2');
+                        const tipoRevistaMatch = htmlContenido.match(/class="como_citar">.*?class="cursivas">\s*([^<\s]+)/s);
+                        const revista = tipoRevistaMatch ? tipoRevistaMatch[1].toLowerCase() : '';
+                        const revistaCompletaMatch = htmlContenido.match(/class="como_citar">\s*<p class="cursivas">\s*([^<]+)/s);
+                        let revistaCompleta = revistaCompletaMatch ? revistaCompletaMatch[1].trim() : '';
+                        if (revistaCompletaMatch) {
+                            revistaCompleta = revistaCompletaMatch[1].replace(/<[^>]*>/g, '').trim();
+                        }
+                        const ubicacionOrcidMatch = cssContenido.match(/\.([^}]*AUT[^}]*)\{\s*[^}]*?text-align\s*:\s*(\w+)\s*;/i);
+                        const valorEncontrado = ubicacionOrcidMatch ? ubicacionOrcidMatch[2] : null;
+                        let ubicacionTexto;
+                        if (revista.includes('problema')) {
+                            ubicacionTexto = (!valorEncontrado || valorEncontrado === '-') ? 'flex-end' : valorEncontrado;
+                        } else if (revistaCompleta.includes('Revista Mexicana de Derecho Constitucional') || revistaCompleta.includes('Estudios en derecho a la información')) {
+                            ubicacionTexto = `center`;
+                        } else {
+                            ubicacionTexto = `flex-end`;
+                        }
+                        let nuevoHtml = htmlContenido;
+                        nuevoHtml = nuevoHtml.replace(/<span class="no-separar">(.*?)<\/span>/g, '$1');
+                        nuevoHtml = nuevoHtml.replace(/&#160;/g, ' ');
+                        nuevoHtml = nuevoHtml.replace(/<meta chatset="utf-8" \/>/g,'/<meta charset="utf-8" \/>\n <meta name="viewport" content="width=device-width, initial-scale=1.0" \/>\n /');
+                        let doiFontFamily = 'inherit';
+                        let doiFontSize = '1em'; 
+                        const doiClassMatch = htmlContenido.match(/<p\s+class="([^"]+)"[^>]*>.*?https?:\/\/doi\.org.*?</s);
+                        if (doiClassMatch && doiClassMatch[1]) {
+                            const doiClassName = doiClassMatch[1].trim().split(' ')[0];
+                            const escapedDoiClassName = doiClassName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                            const cssRuleRegex = new RegExp(`\\.${escapedDoiClassName}[^\\{]*\\{([^\\}]+)\\}`, 'i');
+                            const cssRuleMatch = cssContenido.match(cssRuleRegex);
+                            if (cssRuleMatch && cssRuleMatch[1]) {
+                                const ruleContent = cssRuleMatch[1];
+                                const fontFamilyMatch = ruleContent.match(/font-family:\s*([^;]+)/i);
+                                if (fontFamilyMatch && fontFamilyMatch[1]) {
+                                    doiFontFamily = fontFamilyMatch[1].trim();
+                                }
+                                const fontSizeMatch = ruleContent.match(/font-size:\s*([^;]+)/i);
+                                if (fontSizeMatch && fontSizeMatch[1]) {
+                                    doiFontSize = fontSizeMatch[1].trim();
+                                }
+                            }
+                        }
+                        const estilosDatosAutor = `
+                        .ORCID2 { margin-bottom: 0.2em !important; margin-top: 1.5em !important; }
+                        .ORCID2 + p, .ORCID2 + p + p { margin-top: 0 !important; margin-bottom: 0 !important; line-height: 1.4; }
+                        p:has(+ p.ESTILOS-FINALES_DOI) { margin-bottom: 2em !important; }`;
+                        const clasesVector = `
+                        img { max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: auto; float: center; }
+                        img + p { text-align: center; margin-top: 0.5em; margin-bottom: 0.5em; }
+                        p.REV-DER-SOCIAL_PP:has(+ p.REV-DER-SOCIAL_PP img) { text-align: center; margin-top: 0.5em; margin-bottom: 0.5em; }
+                        p.REV-DER-SOCIAL_Body-text:has(+ p.REV-DER-SOCIAL_Body-text img) { text-align: center; margin-top: 0.5em; margin-bottom: 0.5em; }
+                        p.REV-DER-SOCIAL_PP:has(img) + p.REV-DER-SOCIAL_PP { margin-top: 0.5em; margin-bottom: .5em; }
+                        p.REV-DER-SOCIAL_Body-text:has(img) + p.REV-DER-SOCIAL_Body-text { margin-top: 0.5em; margin-bottom: .5em; }
+                        p.REV-DER-SOCIAL_PP:has(+ table) { text-align: center; margin-top: 0.5em; margin-bottom: 0.5em; }
+                        p.REV-DER-SOCIAL_Body-text:has(+ table) { text-align: center; margin-top: 0.5em; margin-bottom: 0.5em; }
+                        table + p.REV-DER-SOCIAL_PP { margin-top: 1.5em; margin-bottom: 1.5em; }
+                        table + p.REV-DER-SOCIAL_Body-text { margin-top: 1.5em; margin-bottom: 1.5em; }
+                        .ORCID2 { display: flex; justify-content: center; align-items: center; gap: 0.5em; }
+                        .ORCID2 ._idSVGInline { display: inline-block; width: 1em; height: 1em; }
+                        .ORCID2 svg { width: 100%; height: 100%; display: block; }
+                        .ORCID2 a { font-family: ${doiFontFamily}; font-size: ${doiFontSize}; }`;
+                        const svgContent = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 256 256" xml:space="preserve"> <style type="text/css"> .st0{fill:#A6CE39;} .st1{fill:#FFFFFF;} </style> <circle class="st0" cx="128" cy="128" r="128"/> <g> <path class="st1" d="M86.3,186.2H70.9V79.1h15.4v48.4V186.2z"/> <path class="st1" d="M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z M124.3,172.4h24.5c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z"/> <path class="st1" d="M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1 c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z"/> </g> </svg>`;
+                        const regexParaReemplazar = /<p[^>]*class="[^"]*(?:orcid|ORCID|REV-DER-SOCIAL_orcid|REV-DER-SOCIAL_doi|adscripcion|ESTILOS-FINALES_orcid|ESTILOS-FINALES_ORCID)[^"]*"[^>]*>(?:(?!<\/p>).)*?(?<link>https?:\/\/(?:www\.)?orcid\.org\/\d{4}-\d{4}-\d{4}-[0-9X]{4})(?:(?!<\/p>).)*?<\/p>/sig;
+                        nuevoHtml = nuevoHtml.replace(regexParaReemplazar, (matchCompleto, ...args) => {
+                            const groups = args.pop();
+                            const linkCapturado = groups.link.trim();
+                            return `<p class="ORCID2"><span class="_idSVGInline">${svgContent}</span><a href="${linkCapturado}"><span class="Hiperv-nculo">${linkCapturado}</span></a></p>`.trim();
+                        });
+                        const estilosParaTablas = `
+                        table { width: auto; max-width: 100%; border-collapse: collapse; margin-top: 0; margin-bottom: 0; padding-left: 0.5em; padding-right: 0.5em; margin-left: auto; margin-right: auto; }
+                        th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+                        @media (max-width: 768px){
+                            .contenedor{ padding: 1em;} body{font-size: 1em;}
+                            p.ESTILOS-FINALES_SUMARIO{ margin-left: 1em; margin-right: 1em; }
+                            p.ESTILOS-FINALES_BODY-EXT{ text-ident: 1.0em; }
+                        }`;
+                        const bloqueCSS = `\n.contenedor{padding: 2em 3.5em 2em 3.5em;}\n${clasesVector}\n${estilosDatosAutor}\n${cssContenido}\n${estilosParaTablas}\n`;
+                        function pxToEm(match, pxValue) {
+                            const emValue = parseInt(pxValue) / 9;
+                            return `${emValue.toFixed(1)}em;`;
+                        }
+                        const cssModificado = bloqueCSS.replace(/\s*(\d+)px;/g, pxToEm);
+                        const bloqueDeEstiloFinal = `<style>\n${cssModificado}\n</style>`;
+                        const linkRegex = /<link[^>]+href="(?:.\/)?estilos\.css"[^>]*>/i;
+                        if (nuevoHtml.match(linkRegex)) {
+                            nuevoHtml = nuevoHtml.replace(linkRegex, bloqueDeEstiloFinal);
+                        } else {
+                            nuevoHtml = nuevoHtml.replace(/(<\/head>)/i, `${bloqueDeEstiloFinal}\n$1`);
+                        }
+                        nuevoHtml = nuevoHtml.replace(/<body([^>]*)>/i, `<body$1>\n<div class='contenedor'>`);
+                        nuevoHtml = nuevoHtml.replace(/<\/body>/i, `</div>\n</body>`);
+                        nuevoHtml = nuevoHtml.replace(/<br \/>/i, ' ');
+                        const regexNotasAlPie = /(href=")[^#"]*(#[^"]*")/g;
+                        nuevoHtml = nuevoHtml.replace(regexNotasAlPie, '$1$2');
+                        nuevoHtml = nuevoHtml.replace(/ParaOverride-[2,1]/g, '');
+                        // --- FIN DE TU LÓGICA DE CONVERSIÓN ---
+
+                        resolve({
+                            nombre: `r_${htmlFile.name}`,
+                            contenido: nuevoHtml
+                        });
+                    } catch (error) {
+                        console.error("Error al procesar los archivos:", error);
+                        reject(error);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al leer los archivos:", error);
+                    reject(error);
+                });
+        });
+    }
+
+    function descargarBlob(blob, nombreArchivo) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = nombreArchivo;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function descargarArchivo() {
+        if (archivoProcesado) {
+            const blob = new Blob([archivoProcesado], {
+                type: tipoMimeProcesado
+            });
+            descargarBlob(blob, nombreArchivoProcesado);
+        } else {
+            alert("No hay archivo procesado para descargar.");
+        }
+    }
+
+    function reiniciarAplicacion() {
+        htmlFile = null;
+        cssFile = null;
+        archivoProcesado = null;
+        nombreArchivoProcesado = null;
+        tipoMimeProcesado = null;
+        inputHtml.value = '';
+        inputCss.value = '';
+        actualizarEstadoUI();
+        folderFiles = [];
+        inputCarpeta.value = '';
+        estadoCarpeta.textContent = 'Carpeta no seleccionada';
+        estadoCarpeta.classList.add('text-gray-500');
+        estadoCarpeta.classList.remove('text-green-500');
+        botonProcesarCarpeta.disabled = true;
+        botonDescargar.classList.add('hidden');
+        botonReiniciar.classList.add('hidden');
+        botonSubirHtml.disabled = false;
+        botonSubirCss.disabled = false;
+        botonProcesar.textContent = 'Procesar y convertir';
+        botonSubirCarpeta.disabled = false;
+        botonProcesarCarpeta.textContent = 'Procesar y Descargar ZIP';
+        botonProcesarCarpeta.disabled = true;
+    }
 
     botonDescargar.addEventListener('click', descargarArchivo);
     botonReiniciar.addEventListener('click', reiniciarAplicacion);
