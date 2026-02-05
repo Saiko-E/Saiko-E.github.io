@@ -235,11 +235,10 @@
         }
     });
 
-    // --- LÓGICA MODO CARPETA ---
 
     botonSubirCarpeta.addEventListener('click', () => inputCarpeta.click());
 
-    // --- CORRECCIÓN 1: AQUÍ ---
+
     inputCarpeta.addEventListener('change', (event) => {
         folderFiles = Array.from(event.target.files);
         if (folderFiles.length > 0) {
@@ -274,11 +273,9 @@
 
         const zip = new JSZip();
         
-        // 1. Filtrar para procesar solo archivos del directorio raíz (ignorar subcarpetas)
-        // Un archivo está en la raíz si su ruta (ej: "Carpeta/archivo.txt") tiene 2 partes
         const topLevelFiles = folderFiles.filter(file => file.webkitRelativePath.split('/').length === 2);
         
-        // 2. Separar archivos raíz por tipo
+      
         const htmlFiles = topLevelFiles.filter(file => file.name.toLowerCase().endsWith('.html'));
         const cssFiles = topLevelFiles.filter(file => file.name.toLowerCase().endsWith('.css'));
 
@@ -286,7 +283,6 @@
         console.log(`Archivos HTML encontrados: ${htmlFiles.length}`);
         console.log(`Archivos CSS encontrados: ${cssFiles.length}`);
 
-        // 3. Emparejamiento flexible:
         for (const htmlFile of htmlFiles) {
             const baseName = htmlFile.name.replace(/\.html$/i, '');
             const matchingCssFile = cssFiles.find(cssFile => 
@@ -301,7 +297,7 @@
             }
         }
 
-        // 4. Continuar con el procesamiento
+    
         if (pairs.length === 0) {
             alert("No se encontraron pares de archivos .html y .css que coincidan en el directorio principal.");
             reiniciarAplicacion(); 
@@ -346,7 +342,6 @@
     });
 
 
-    // --- FUNCIONES CENTRALIZADAS (SIN CAMBIOS) ---
     function generarHtmlProcesado(htmlFile, cssFile) {
         return new Promise((resolve, reject) => {
             const leerHTML = new Promise((res, rej) => {
@@ -366,7 +361,6 @@
             Promise.all([leerHTML, leerCSS])
                 .then(([htmlContenido, cssContenido]) => {
                     try {
-                        // --- INICIO DE TU LÓGICA DE CONVERSIÓN ---
                         cssContenido = cssContenido.replace(/(ORCID)|(orcid)/gi, 'ORCID2');
                         const tipoRevistaMatch = htmlContenido.match(/class="como_citar">.*?class="cursivas">\s*([^<\s]+)/s);
                         const revista = tipoRevistaMatch ? tipoRevistaMatch[1].toLowerCase() : '';
